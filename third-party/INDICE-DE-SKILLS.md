@@ -24,6 +24,7 @@ Origen: czlonkowski/n8n-skills (MIT). Entrada: `using-n8n-mcp-skills`.
 | n8n-mcp-tools-expert | Usar las herramientas de n8n-mcp. |
 | n8n-multi-instance | Más de una instancia de n8n. |
 | n8n-self-hosting | Instalar n8n propio con Docker. |
+| **plantillas-n8n** (original) | Partir de un flujo ya hecho: buscar en una biblioteca de unos 2.000 flujos, limpiarlo y adaptarlo. |
 
 ## Agentes en Cloudflare
 - **crear-agente** (santmun, MIT): guía en español para crear un agente de IA en Cloudflare.
@@ -60,6 +61,27 @@ Origen: anthropics/skills (Apache-2.0).
 |---|---|
 | mcp-builder | Crear un servidor MCP propio. |
 
+## Gemini (oficiales de Google)
+Origen: google-gemini/gemini-skills (Apache-2.0).
+
+| Skill | Cuándo usarla |
+|---|---|
+| gemini-api-dev | Programar llamadas a la API de Gemini: texto, chat, imágenes y archivos. |
+| gemini-live-api-dev | Voz y video en tiempo real con Gemini Live. |
+
+## Calidad y seguridad de agentes (originales)
+| Skill | Cuándo usarla |
+|---|---|
+| **probar-prompts** | Probar un prompt con casos normales, ambiguos y de engaño, con promptfoo. |
+| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. |
+
+## APIs y mensajería (originales)
+| Skill | Cuándo usarla |
+|---|---|
+| **apis-gratis** | Elegir un modelo, una API o un aviso al teléfono gratis, con sus límites y riesgos. |
+| **bot-telegram** | Un bot de Telegram gratis en Cloudflare Workers, con lista de usuarios permitidos. |
+| **whatsapp-cloud-api** | Conectar un agente a la API oficial de WhatsApp: webhook, firma, ventana de 24 horas. |
+
 ## Se movieron a `app-skills-jeiler`
 `frontend-design`, `webapp-testing`, `theme-factory` y `canvas-design`: no son de agentes y estaban repetidas.
 
@@ -68,4 +90,6 @@ En `skills/` siguen las skills originales de Vercel (`react-best-practices`, `co
 Cuatro de ellas tienen el mismo nombre que copias en `app-skills-jeiler` o `apk-skills-jeiler`: **no instalar las dos copias en la misma sesión.** `instalar.sh` no las incluye en ningún grupo.
 
 ## Revisadas y NO incluidas
+- gemini-api-cli (Google): su instalación ejecuta un script descargado (`curl ... | bash`). No se copió.
+- clasp-skill (tnisizawa, Apps Script): está escrita en japonés y tiene muy poco uso. No se copió.
 - win11-admin-skill (optimaquantum): 830 líneas, 2 estrellas, activación «proactiva» para cualquier tarea de Windows, trae una ruta personal del autor. Cambia registro y servicios; no la recomiendo sin más pruebas.

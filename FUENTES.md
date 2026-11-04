@@ -9,5 +9,8 @@ Las copias de los repos propios (forks) pueden ir atrasadas frente al original. 
 | `crear-agente` | santmun/crear-agente | 9c5d246 | 2026-07-09 | MIT |
 | `mcp-builder` | anthropics/skills | ca45fc4 | 2026-10-28 | Apache-2.0 |
 | 7 de Firebase | firebase/agent-skills | b76be96 | 2026-11-03 | Apache-2.0 |
+| `gemini-api-dev`, `gemini-live-api-dev` | google-gemini/gemini-skills | e1f29de | 2026-11-03 | Apache-2.0 |
 | 6 de Cloudflare | cloudflare/skills | 1f2cd0a | 2026-11-03 | Apache-2.0 |
 | Skills originales de Vercel (heredadas del fork) | vercel-labs/agent-skills | 063bee9 | 2026-08-28 | Cada skill declara la suya; el repo de origen no trae LICENSE |
+
+Originales de este repo (licencia MIT, ver `LICENSE-originales`): `probar-prompts`, `seguridad-agentes`, `apis-gratis`, `bot-telegram`, `plantillas-n8n`, `whatsapp-cloud-api`.
