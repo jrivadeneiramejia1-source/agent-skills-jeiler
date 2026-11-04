@@ -38,6 +38,13 @@ print("pinData quitado:", quito_pin, "| activo=False")
 print("credenciales que debes crear tú:", necesitan if necesitan else "ninguna")
 ```
    Se probó sobre un flujo real de la biblioteca: quedó con 0 credenciales, sin `pinData` y desactivado.
+
+   **El script NO quita claves ni correos escritos directo en los parámetros** (por ejemplo en un encabezado `Authorization: Bearer ...`). Al revisar los 2.061 flujos de la biblioteca (2026-11-04): 217 vienen activos, 136 traen `pinData`, 286 tienen direcciones de correo escritas dentro, y 4 traen algo con forma de clave real (`pplx-`, `apify_`, `glpat-`, `AIzaSy`) en lugar de un marcador como `YOUR_TOKEN`. Por eso, después de limpiar, **buscar claves antes de seguir** y **no usar jamás una clave que venga en una plantilla** (puede ser ajena o estar filtrada):
+```bash
+# Uso: grep -nEo "$PATRON" SALIDA.json   (si imprime algo, reemplazar por un marcador y crear la propia en n8n)
+PATRON='(Bearer +[A-Za-z0-9._-]{20,}|pplx-[A-Za-z0-9]{10,}|apify_[a-z]+_[A-Za-z0-9]{10,}|glpat-[A-Za-z0-9_-]{10,}|AIza[0-9A-Za-z_-]{35}|sk-[A-Za-z0-9]{20,}|[0-9]{8,10}:[A-Za-z0-9_-]{35}|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,})'
+```
+   Los marcadores tipo `YOUR_TOKEN` también salen en la búsqueda (empiezan con `Bearer`): no son claves, solo hay que reemplazarlos al configurar.
 5. **Adaptar** a lo que el usuario necesita (nodos, textos, destinos). Seguir las skills `n8n-workflow-patterns`, `n8n-node-configuration` y `n8n-error-handling`.
 6. **Validar** con `n8n-validation-expert` y `n8n-mcp-tools-expert` si hay acceso a n8n-mcp; si no, importar en n8n y revisar los avisos.
 7. **Probar con datos inventados**, nunca con datos reales, y con la skill `seguridad-agentes` si el flujo envía mensajes o toca archivos.
