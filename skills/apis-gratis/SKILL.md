@@ -5,7 +5,7 @@ description: Ayuda a elegir APIs y servicios gratuitos para un agente o una app 
 
 # APIs y servicios gratuitos
 
-Los planes gratuitos cambian seguido. Los números de este archivo son una **foto del 2026-10** tomada de las listas del propio usuario. **Antes de decidir, verificar el límite en la página oficial del proveedor y anotar la fecha.**
+Los planes gratuitos cambian seguido. Los números de este archivo son una **foto del 2026-10** tomada de las listas del propio usuario; el 2026-11-04 se contrastaron con búsquedas web (no se pudieron abrir las páginas oficiales por la red de la sesión) y lo que cambió está marcado en la tabla. **Antes de decidir, verificar el límite en la página oficial del proveedor y anotar la fecha.**
 
 ## Reglas
 - **Nunca pedir ni guardar claves.** El usuario crea la cuenta y guarda la clave como secreto (`wrangler secret put`, credenciales de n8n).
@@ -18,11 +18,11 @@ Fuente: `awesome-free-llm-apis` (tu fork, commit `cf97c32`, 2026-10-11). Ahí es
 
 | Proveedor | Lo que dice la lista | Cuidado |
 |---|---|---|
-| **Google Gemini** (AI Studio) | Plan gratuito sin tarjeta. Modelos Flash: 15 solicitudes por minuto y 1.500 por día; Flash-Lite: 30 por minuto; Pro: 5 por minuto y 50 por día. | **Los mensajes del plan gratuito pueden ser usados por Google para mejorar sus productos.** |
-| **Groq** | Plan gratuito sin tarjeta. Modelos `gpt-oss`: 30 por minuto y 1.000 por día. | Revisar sus condiciones de datos. |
-| **Cloudflare Workers AI** | 10.000 «Neurons» por día gratis, más de 60 modelos. Se usa dentro de un Worker. | Los Neurons se gastan según el modelo; medir. |
-| **Mistral** | Modo gratuito activado por defecto, cerca de 1 solicitud por segundo. | **Los mensajes del modo gratuito pueden usarse para entrenar, salvo que se desactive.** |
-| **OpenRouter** | Modelos con sufijo `:free`: 20 por minuto y 50 por día. | Límite diario bajo. |
+| **Google Gemini** (AI Studio) | Plan gratuito sin tarjeta. La lista decía: Flash 15 por minuto y 1.500 por día; Flash-Lite 30 por minuto; Pro 5 por minuto y 50 por día. **Esas cifras probablemente ya no valen:** mensajes de desarrolladores en foros de Google (2026) hablan de unas 20 solicitudes por día en el Flash nuevo y 500 en Flash-Lite, y un empleado de Google dijo que el plan gratuito es «de mejor esfuerzo» y puede cambiar. No pude abrir la página oficial. | **Los mensajes del plan gratuito pueden ser usados por Google para mejorar sus productos.** Ver el límite real en AI Studio, en la página de cuotas. |
+| **Groq** | Plan gratuito sin tarjeta. Modelos `gpt-oss`: 30 por minuto y 1.000 por día (cifras de su página de límites; esa página las da como límites base y no deja claro si son los del plan gratuito). | Ver los límites de tu cuenta en la consola de Groq. Revisar sus condiciones de datos. |
+| **Cloudflare Workers AI** | 10.000 «Neurons» por día gratis (confirmado en su documentación, 2026-11-04), más de 60 modelos. Se usa dentro de un Worker. | Los Neurons se gastan según el modelo; medir. Algunos modelos nuevos son solo de pago (en el plan gratis dan error 403). Pasado el límite se cobra: US$0,011 por cada 1.000 Neurons. |
+| **Mistral** | Modo gratuito activado por defecto, cerca de 1 solicitud por segundo. | **Los mensajes del modo gratuito pueden usarse para entrenar, salvo que se desactive** (confirmado en su centro de ayuda). Se desactiva en el panel de administración, en Privacidad, apagando «datos anónimos de mejora». |
+| **OpenRouter** | Modelos con sufijo `:free`: 20 por minuto y 50 por día (confirmado, 2026-11-04). Con unos US$10 de crédito comprado sube a 1.000 por día. | Límite diario bajo. Las solicitudes que fallan también cuentan. |
 
 Todos usan el formato de OpenAI, así que cambiar de proveedor es cambiar la dirección y la clave.
 
@@ -43,7 +43,7 @@ La lista tiene más de 50 categorías. Buscar ahí antes de crear algo desde cer
 ## Avisos al teléfono sin pagar
 | Opción | Cómo | Cuidado |
 |---|---|---|
-| **ntfy** | Un mensaje HTTP a una dirección con un nombre de tema; la app de ntfy en el teléfono lo recibe. El servidor público gratuito no pide cuenta. | En el servidor público **el nombre del tema funciona como contraseña**: cualquiera que lo sepa puede leer. Usar un nombre largo e imposible de adivinar, o instalar ntfy en un servidor propio. Verificar licencia y límites en ntfy.sh. |
+| **ntfy** | Un mensaje HTTP a una dirección con un nombre de tema; la app de ntfy en el teléfono lo recibe. El servidor público gratuito no pide cuenta. | En el servidor público **el nombre del tema funciona como contraseña**: cualquiera que lo sepa puede leer. Usar un nombre largo e imposible de adivinar, o instalar ntfy en un servidor propio. Límites del servidor público (documentación de ntfy, 2026-11-04): 250 mensajes por día por visitante, ráfaga de 60 solicitudes y luego una cada 5 a 10 segundos, y 4.096 bytes por mensaje; si se pasa, pone un bloqueo temporal a la dirección IP. |
 | **Bot de Telegram** | Un mensaje del bot a tu chat (skill `bot-telegram`). | Solo tú debes estar en la lista de usuarios permitidos. |
 | **Pushover** | Lo que usa `crear-agente`. | Es de pago. Preferir las dos anteriores. |
 

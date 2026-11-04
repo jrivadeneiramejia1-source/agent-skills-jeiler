@@ -54,7 +54,8 @@ Desde un flujo o un Worker, el bot puede enviarse un mensaje a sí mismo con el 
 
 ## Qué se probó y qué no
 - **Probado** (sin internet, con grammY y llamadas a Telegram simuladas): la lista de permitidos responde a un usuario permitido y ignora a uno desconocido, y el comando `/start` responde.
-- **No probado:** el Worker en Cloudflare, el adaptador `cloudflare-mod` con `secretToken` y el registro real del webhook. El adaptador `cloudflare-mod` con `botInfo` sale de la guía oficial de grammY para Cloudflare Workers; `secretToken` sale de la documentación general de `webhookCallback`. Confirmar ambos en la documentación de grammY antes de publicar.
+- **Probado el 2026-11-04** con el esqueleto de arriba corriendo en el motor local de Cloudflare (`wrangler dev` 4.157, grammY con `cloudflare-mod`, `botInfo` y `secretToken`): sin la clave secreta o con una equivocada, el Worker responde **401** y no procesa nada; con la clave correcta y un usuario que no está en la lista, responde 200 y no contesta; con la clave y un usuario permitido, intenta contestar con `sendMessage` (en la prueba falló solo porque no había salida a Telegram). Cualquier petición sin la clave, incluso un GET, da 401.
+- **No probado:** el Worker publicado en Cloudflare, el registro real del webhook con `setWebhook` y una conversación real con Telegram (necesitan un token real, que se queda en manos del usuario). Ojo: si Telegram no responde y el Worker da 500, Telegram reintenta el mensaje varias veces.
 
 ## Señales de alerta
 - El token pegado en el chat, en el código o en un archivo del repositorio.

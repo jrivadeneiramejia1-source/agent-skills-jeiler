@@ -7,7 +7,7 @@ description: Guía para conectar un agente o un flujo de n8n a la API oficial de
 
 ## Reglas
 - **Nunca pedir ni guardar** el token de acceso ni el «App Secret». El usuario los guarda como secretos.
-- **Los precios y las reglas cambian.** Lo escrito abajo es de la búsqueda del 2026-11-04 y viene en parte de blogs de proveedores. **Verificar en la página oficial de precios de Meta antes de decidir.**
+- **Los precios y las reglas cambian.** Lo escrito abajo es de las búsquedas del 2026-11-04 (la regla de octubre de 2026 viene de la página oficial de Meta; otros datos, de blogs de proveedores). **Verificar en la página oficial de precios de Meta antes de decidir.**
 - No usar librerías no oficiales con el número principal del usuario.
 
 ## Cómo funciona
@@ -15,7 +15,7 @@ description: Guía para conectar un agente o un flujo de n8n a la API oficial de
 2. **Firma de cada mensaje.** Cada mensaje llega por POST con el encabezado `X-Hub-Signature-256`. Se calcula un HMAC-SHA256 del **cuerpo exacto sin modificar** con el «App Secret» y se compara con el valor que viene después de `sha256=`. Volver a escribir el JSON antes de calcularlo cambia los bytes y rompe la comprobación. Si no coincide, se descarta el mensaje.
 3. **Ventana de 24 horas.** Cuando un cliente te escribe, se abre una ventana de 24 horas; cada mensaje nuevo del cliente la reinicia. Dentro de la ventana puedes responder con texto libre. **Fuera de la ventana solo se pueden enviar plantillas aprobadas por Meta.**
 4. **Plantillas.** Mensajes con formato fijo que Meta debe aprobar antes de usarlos. Para avisos iniciados por el negocio.
-5. **Costo.** Desde el 1 de julio de 2025 Meta cobra **por mensaje de plantilla entregado**, no por conversación de 24 horas. El precio depende de la categoría (marketing, utilidad, autenticación) y del país. Hay fuentes que dicen que desde el 1 de octubre de 2026 también se cobrarían mensajes dentro de la ventana; **esto está sin confirmar. Revisar la página oficial.**
+5. **Costo.** Desde el 1 de julio de 2025 Meta cobra **por mensaje de plantilla entregado**, no por conversación de 24 horas. El precio depende de la categoría (marketing, utilidad, autenticación) y del país. **Desde el 1 de octubre de 2026 también se cobran los mensajes dentro de la ventana de 24 horas** (los de «servicio», o sea las respuestas de texto libre): la página oficial de precios de Meta, actualizada el 2026-09-30, dice que se cobra cada mensaje entregado. Cada número de teléfono tiene **1.000 mensajes de servicio gratis al mes** (no se acumulan) y desde el 1.001 se cobra, con la misma tarifa que utilidad y autenticación. Sin método de pago registrado, Meta no entrega los mensajes pasada la cuota gratis. Esto se leyó en el resumen de una búsqueda, no en la página completa: confirmar la tarifa de tu país en la página oficial antes de montar algo.
 
 ## En n8n
 n8n tiene nodos para WhatsApp Business Cloud (un disparador y un nodo de envío). Confirmar los nombres y la versión en tu n8n. Si el flujo recibe mensajes por webhook propio, aplicar la comprobación de la firma del punto 2.
