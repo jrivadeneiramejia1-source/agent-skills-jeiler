@@ -1,1 +1,1 @@
-Fuente: https://github.com/anthropics/skills (commit ca45fc4). Solo se copiaron skills con licencia Apache-2.0.
+Fuente: https://github.com/anthropics/skills (commit ca45fc4). Aquí solo queda mcp-builder (Apache-2.0). frontend-design, webapp-testing, theme-factory y canvas-design se movieron a app-skills-jeiler.

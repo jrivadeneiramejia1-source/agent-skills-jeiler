@@ -1,0 +1,1 @@
+Fuente: https://github.com/google-gemini/gemini-skills (commit e1f29de, 2026-11-03). Apache-2.0. Se copiaron gemini-api-dev y gemini-live-api-dev. No se copió gemini-api-cli porque su instalación ejecuta un script descargado (curl | bash).

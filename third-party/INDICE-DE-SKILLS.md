@@ -1,5 +1,7 @@
 # Índice de skills agregadas (para saber cuándo usar cada una)
 
+**Instalarlas:** `./instalar.sh --lista` muestra los grupos y `./instalar.sh n8n firebase` instala los que elijas. En sesiones en la nube se instalan solos los grupos de `grupos-activos.txt` (hoy: `n8n` y `agentes-cloudflare`). Origen y versión de cada skill: `FUENTES.md`. Revisión de seguridad: `SEGURIDAD.md`.
+
 Todas son de terceros, con licencia libre (MIT o Apache-2.0). Cada carpeta de origen trae su licencia en `third-party/`.
 No se probó ninguna en una tarea real; solo se verificó que el archivo `SKILL.md` es válido y que no tiene comandos de riesgo.
 
@@ -22,6 +24,7 @@ Origen: czlonkowski/n8n-skills (MIT). Entrada: `using-n8n-mcp-skills`.
 | n8n-mcp-tools-expert | Usar las herramientas de n8n-mcp. |
 | n8n-multi-instance | Más de una instancia de n8n. |
 | n8n-self-hosting | Instalar n8n propio con Docker. |
+| **plantillas-n8n** (original) | Partir de un flujo ya hecho: buscar en una biblioteca de unos 2.000 flujos, limpiarlo y adaptarlo. |
 
 ## Agentes en Cloudflare
 - **crear-agente** (santmun, MIT): guía en español para crear un agente de IA en Cloudflare.
@@ -51,16 +54,42 @@ Origen: firebase/agent-skills (Apache-2.0).
 | firebase-hosting-basics | Publicar una web estática o SPA. |
 | firebase-ai-logic-basics | Usar Gemini dentro de una app con Firebase. |
 
-## Diseño, pruebas y MCP
+## MCP
 Origen: anthropics/skills (Apache-2.0).
 
 | Skill | Cuándo usarla |
 |---|---|
-| frontend-design | Que una interfaz web se vea cuidada y no genérica. |
-| webapp-testing | Probar una app web local con navegador (Playwright) y tomar capturas. |
-| theme-factory | Aplicar un tema de colores y letras a presentaciones, documentos o páginas. |
-| canvas-design | Pósters y piezas visuales en PNG o PDF (por ejemplo, tarjetas de felicitación). |
 | mcp-builder | Crear un servidor MCP propio. |
 
+## Gemini (oficiales de Google)
+Origen: google-gemini/gemini-skills (Apache-2.0).
+
+| Skill | Cuándo usarla |
+|---|---|
+| gemini-api-dev | Programar llamadas a la API de Gemini: texto, chat, imágenes y archivos. |
+| gemini-live-api-dev | Voz y video en tiempo real con Gemini Live. |
+
+## Calidad y seguridad de agentes (originales)
+| Skill | Cuándo usarla |
+|---|---|
+| **probar-prompts** | Probar un prompt con casos normales, ambiguos y de engaño, con promptfoo. |
+| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. |
+
+## APIs y mensajería (originales)
+| Skill | Cuándo usarla |
+|---|---|
+| **apis-gratis** | Elegir un modelo, una API o un aviso al teléfono gratis, con sus límites y riesgos. |
+| **bot-telegram** | Un bot de Telegram gratis en Cloudflare Workers, con lista de usuarios permitidos. |
+| **whatsapp-cloud-api** | Conectar un agente a la API oficial de WhatsApp: webhook, firma, ventana de 24 horas. |
+
+## Se movieron a `app-skills-jeiler`
+`frontend-design`, `webapp-testing`, `theme-factory` y `canvas-design`: no son de agentes y estaban repetidas.
+
+## Skills de Vercel heredadas del fork
+En `skills/` siguen las skills originales de Vercel (`react-best-practices`, `composition-patterns`, `react-view-transitions`, `react-native-skills`, `web-design-guidelines`, `deploy-to-vercel` y otras). **No las borré**, para seguir recibiendo actualizaciones del original.
+Cuatro de ellas tienen el mismo nombre que copias en `app-skills-jeiler` o `apk-skills-jeiler`: **no instalar las dos copias en la misma sesión.** `instalar.sh` no las incluye en ningún grupo.
+
 ## Revisadas y NO incluidas
+- gemini-api-cli (Google): su instalación ejecuta un script descargado (`curl ... | bash`). No se copió.
+- clasp-skill (tnisizawa, Apps Script): está escrita en japonés y tiene muy poco uso. No se copió.
 - win11-admin-skill (optimaquantum): 830 líneas, 2 estrellas, activación «proactiva» para cualquier tarea de Windows, trae una ruta personal del autor. Cambia registro y servicios; no la recomiendo sin más pruebas.
