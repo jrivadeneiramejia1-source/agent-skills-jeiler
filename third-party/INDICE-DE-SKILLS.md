@@ -1,5 +1,7 @@
 # Índice de skills agregadas (para saber cuándo usar cada una)
 
+**Instalarlas:** `./instalar.sh --lista` muestra los grupos y `./instalar.sh n8n firebase` instala los que elijas. En sesiones en la nube se instalan solos los grupos de `grupos-activos.txt` (hoy: `n8n` y `agentes-cloudflare`). Origen y versión de cada skill: `FUENTES.md`. Revisión de seguridad: `SEGURIDAD.md`.
+
 Todas son de terceros, con licencia libre (MIT o Apache-2.0). Cada carpeta de origen trae su licencia en `third-party/`.
 No se probó ninguna en una tarea real; solo se verificó que el archivo `SKILL.md` es válido y que no tiene comandos de riesgo.
 
@@ -51,16 +53,19 @@ Origen: firebase/agent-skills (Apache-2.0).
 | firebase-hosting-basics | Publicar una web estática o SPA. |
 | firebase-ai-logic-basics | Usar Gemini dentro de una app con Firebase. |
 
-## Diseño, pruebas y MCP
+## MCP
 Origen: anthropics/skills (Apache-2.0).
 
 | Skill | Cuándo usarla |
 |---|---|
-| frontend-design | Que una interfaz web se vea cuidada y no genérica. |
-| webapp-testing | Probar una app web local con navegador (Playwright) y tomar capturas. |
-| theme-factory | Aplicar un tema de colores y letras a presentaciones, documentos o páginas. |
-| canvas-design | Pósters y piezas visuales en PNG o PDF (por ejemplo, tarjetas de felicitación). |
 | mcp-builder | Crear un servidor MCP propio. |
+
+## Se movieron a `app-skills-jeiler`
+`frontend-design`, `webapp-testing`, `theme-factory` y `canvas-design`: no son de agentes y estaban repetidas.
+
+## Skills de Vercel heredadas del fork
+En `skills/` siguen las skills originales de Vercel (`react-best-practices`, `composition-patterns`, `react-view-transitions`, `react-native-skills`, `web-design-guidelines`, `deploy-to-vercel` y otras). **No las borré**, para seguir recibiendo actualizaciones del original.
+Cuatro de ellas tienen el mismo nombre que copias en `app-skills-jeiler` o `apk-skills-jeiler`: **no instalar las dos copias en la misma sesión.** `instalar.sh` no las incluye en ningún grupo.
 
 ## Revisadas y NO incluidas
 - win11-admin-skill (optimaquantum): 830 líneas, 2 estrellas, activación «proactiva» para cualquier tarea de Windows, trae una ruta personal del autor. Cambia registro y servicios; no la recomiendo sin más pruebas.
