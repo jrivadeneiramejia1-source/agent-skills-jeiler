@@ -8,4 +8,5 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
 fi
 
 cd "${CLAUDE_PROJECT_DIR:-.}"
-bash ./instalar.sh --activos
+# La salida va a stderr para no agregar texto al contexto de la sesión.
+bash ./instalar.sh --activos >&2
