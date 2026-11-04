@@ -1,0 +1,66 @@
+# Índice de skills agregadas (para saber cuándo usar cada una)
+
+Todas son de terceros, con licencia libre (MIT o Apache-2.0). Cada carpeta de origen trae su licencia en `third-party/`.
+No se probó ninguna en una tarea real; solo se verificó que el archivo `SKILL.md` es válido y que no tiene comandos de riesgo.
+
+## n8n (agentes y automatizaciones)
+Origen: czlonkowski/n8n-skills (MIT). Entrada: `using-n8n-mcp-skills`.
+
+| Skill | Cuándo usarla |
+|---|---|
+| using-n8n-mcp-skills | Cualquier tarea de n8n; te manda a la skill correcta. |
+| n8n-workflow-patterns | Diseñar un flujo nuevo (webhook, API, lotes, horarios). |
+| n8n-node-configuration | Configurar los campos de un nodo. |
+| n8n-expression-syntax | Escribir `{{ }}` y pasar datos entre nodos. |
+| n8n-code-javascript / n8n-code-python | Nodo Code. |
+| n8n-code-tool | Herramienta de código para un agente de IA. |
+| n8n-agents | Agentes de IA, memoria, herramientas, RAG. |
+| n8n-subworkflows | Dividir en sub-flujos reutilizables. |
+| n8n-error-handling | Que los fallos no pasen en silencio. |
+| n8n-validation-expert | Entender errores y avisos de validación. |
+| n8n-binary-and-data | Archivos, imágenes, PDF. |
+| n8n-mcp-tools-expert | Usar las herramientas de n8n-mcp. |
+| n8n-multi-instance | Más de una instancia de n8n. |
+| n8n-self-hosting | Instalar n8n propio con Docker. |
+
+## Agentes en Cloudflare
+- **crear-agente** (santmun, MIT): guía en español para crear un agente de IA en Cloudflare.
+
+## Cloudflare (apps y Workers)
+Origen: cloudflare/skills (Apache-2.0).
+
+| Skill | Cuándo usarla |
+|---|---|
+| cloudflare | No sé qué producto de Cloudflare usar. |
+| wrangler | Comandos de Wrangler, desarrollo local y despliegue. |
+| workers-best-practices | Escribir o revisar un Worker. |
+| web-perf | Velocidad de carga de una web. |
+| durable-objects | Estado y coordinación entre usuarios. |
+| agents-sdk | Agentes de IA con el SDK de Cloudflare. |
+
+## Firebase
+Origen: firebase/agent-skills (Apache-2.0).
+
+| Skill | Cuándo usarla |
+|---|---|
+| firebase-basics | Instalar la herramienta de Firebase, iniciar sesión, crear o elegir proyecto. |
+| firebase-auth-basics | Inicio de sesión de usuarios. |
+| firebase-firestore | Base de datos Firestore. |
+| firestore-rules-creation | Escribir las reglas de seguridad de Firestore. |
+| firebase-security-rules-auditor | Revisar si las reglas tienen huecos. |
+| firebase-hosting-basics | Publicar una web estática o SPA. |
+| firebase-ai-logic-basics | Usar Gemini dentro de una app con Firebase. |
+
+## Diseño, pruebas y MCP
+Origen: anthropics/skills (Apache-2.0).
+
+| Skill | Cuándo usarla |
+|---|---|
+| frontend-design | Que una interfaz web se vea cuidada y no genérica. |
+| webapp-testing | Probar una app web local con navegador (Playwright) y tomar capturas. |
+| theme-factory | Aplicar un tema de colores y letras a presentaciones, documentos o páginas. |
+| canvas-design | Pósters y piezas visuales en PNG o PDF (por ejemplo, tarjetas de felicitación). |
+| mcp-builder | Crear un servidor MCP propio. |
+
+## Revisadas y NO incluidas
+- win11-admin-skill (optimaquantum): 830 líneas, 2 estrellas, activación «proactiva» para cualquier tarea de Windows, trae una ruta personal del autor. Cambia registro y servicios; no la recomiendo sin más pruebas.
