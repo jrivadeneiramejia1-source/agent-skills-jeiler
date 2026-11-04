@@ -14,3 +14,11 @@ Las copias de los repos propios (forks) pueden ir atrasadas frente al original. 
 | Skills originales de Vercel (heredadas del fork) | vercel-labs/agent-skills | 063bee9 | 2026-08-28 | Cada skill declara la suya; el repo de origen no trae LICENSE |
 
 Originales de este repo (licencia MIT, ver `LICENSE-originales`): `probar-prompts`, `seguridad-agentes`, `apis-gratis`, `bot-telegram`, `plantillas-n8n`, `whatsapp-cloud-api`.
+
+## Revisar si hay versiones nuevas (cada mes)
+```bash
+python3 -I comparar-fuentes.py
+```
+Es de solo lectura: compara cada commit de esta tabla con el más nuevo del repo de origen y dice «igual» o «HAY CAMBIOS» (o no pudo consultar). Salida 0 = todo igual, 1 = hay cambios, 2 = no se pudo consultar alguno. Que haya cambios no obliga a actualizar: primero mirar qué cambió, volver a revisar su seguridad (`SEGURIDAD.md`) y actualizar la fila de esta tabla. Probado el 2026-11-04.
+
+También avisa cuando la tabla de límites de `apis-gratis` tiene 3 meses o más: ahí hay que volver a verificar los planes gratuitos en las páginas oficiales.
