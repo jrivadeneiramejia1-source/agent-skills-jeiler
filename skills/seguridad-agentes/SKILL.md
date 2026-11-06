@@ -26,6 +26,13 @@ Se basa en los riesgos del proyecto OWASP «Top 10 para aplicaciones con LLM». 
 9. **Registros.** Guardar qué hizo el agente y cuándo, **sin** guardar datos sensibles ni claves.
 10. **Cosas de terceros.** Skills, plugins, servidores MCP y paquetes: leerlos antes de instalar, fijar versiones y revisar con `gitleaks`. `snyk/agent-scan` existe, pero exige cuenta de Snyk y envía el contenido a su servicio.
 
+## Revisor automático de bots (Telegram y WhatsApp)
+Para un bot que ya tiene código (Worker de Cloudflare, Node o Python):
+```
+python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT
+```
+Avisa: claves escritas, variables secretas en `wrangler.toml`, `.env` sin ignorar, falta de `secret_token` (Telegram), falta de lista de usuarios, falta de la firma `X-Hub-Signature-256` (WhatsApp), `hub.challenge` sin `hub.verify_token`, registro del mensaje completo y uso de `eval`/`exec`. Salida 0/1/2 como el revisor de n8n. Solo lee texto, no imprime claves y busca patrones: **no prueba** que el bot sea seguro. Los flujos de n8n se revisan con `revisar-flujo-n8n`. Ejemplos bueno y malo en `ejemplos/`.
+
 ## Informe
 Tabla con tres columnas: **Riesgo**, **Qué encontré** y **Arreglo propuesto**, con gravedad (alta, media, baja). Al final: qué no se pudo probar.
 
@@ -43,3 +50,4 @@ Tabla con tres columnas: **Riesgo**, **Qué encontré** y **Arreglo propuesto**,
 - [ ] Los webhooks comprueban quién los manda.
 - [ ] Hay límites de uso.
 - [ ] Ninguna clave está en el código ni en el chat.
+- [ ] `revisar_bot.py` (o `revisar-flujo-n8n`) corrió sin hallazgos ALTA.

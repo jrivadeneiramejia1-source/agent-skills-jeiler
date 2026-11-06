@@ -35,6 +35,9 @@ Las que se conectan como «WhatsApp Web» (por ejemplo Baileys o whatsapp-web.js
 - Documentación oficial de Meta: «Create a webhook endpoint» (WhatsApp Business Platform), en developers.facebook.com.
 - Guías de terceros sobre webhooks de WhatsApp (hookdeck.com) y sobre precios (courier.com, omnichat.ai). Son blogs, no documentos oficiales.
 
+## Revisar el bot
+`python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT` avisa si falta la firma `X-Hub-Signature-256`, la comparación de tiempo constante o el `hub.verify_token`. En `skills/seguridad-agentes/ejemplos/bot-whatsapp-bueno/` hay una verificación de firma con HMAC probada con 8 casos (firma buena, cuerpo alterado, secreto distinto, encabezado ausente o mal formado).
+
 ## Qué no se probó
 Nada de esto se probó con una cuenta real de WhatsApp: la skill resume la documentación y no se ejecutó contra la API.
 

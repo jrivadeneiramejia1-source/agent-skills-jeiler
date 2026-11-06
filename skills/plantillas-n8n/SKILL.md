@@ -23,7 +23,7 @@ La biblioteca es `Zie619/n8n-workflows` (MIT): 2.061 flujos en `workflows/<Servi
 
 ```python
 import json, sys
-# Uso: python3 -I limpiar-flujo.py ENTRADA.json SALIDA.json
+# Uso: python -I limpiar-flujo.py ENTRADA.json SALIDA.json
 entrada, salida = sys.argv[1], sys.argv[2]
 d = json.load(open(entrada, encoding="utf-8"))
 quito_pin = bool(d.pop("pinData", None))

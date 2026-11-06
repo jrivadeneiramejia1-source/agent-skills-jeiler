@@ -22,3 +22,10 @@ Hecha el 2026-11-04.
 - Se dejó fuera `gemini-api-cli`: su instalación ejecuta un script descargado (`curl ... | bash`).
 - `plantillas-n8n` apunta a una biblioteca de flujos de terceros (no se copió al repo). Trae un script que quita credenciales y datos de prueba antes de importar.
 - Las skills originales no se han probado en tareas reales. Lo probado de forma parcial está dicho en cada una (`probar-prompts` con promptfoo sin internet; `bot-telegram` con llamadas simuladas; `plantillas-n8n` con el script de limpieza).
+
+## Fase 3 (2026-11-06)
+- Se agregó 1 skill original (`revisar-flujo-n8n`) y scripts originales (`revisar_flujo.py`, `revisar_bot.py`). Son solo Python estándar: no abren redes, no ejecutan lo que revisan y no imprimen valores de claves. Sin código de terceros nuevo.
+- **gitleaks 8.30.0** se volvió a descargar del sitio oficial (checksum `OK`) y se corrió sobre los archivos: **los mismos 5 hallazgos** de antes (todos ejemplos ficticios). Lo nuevo no agregó ninguno.
+- Los ejemplos malos traen un token inventado (`000000000:FAKEFAKE…`) a propósito para probar los revisores; no es una clave real.
+- Se borraron 5 `.zip` repetidos de `skills/` (copias empaquetadas de carpetas que ya estaban). El historial de git los conserva.
+- `crear-agente` (de terceros): la línea `description` no era YAML válido (tenía «Stack base: …» sin comillas), así que un lector estricto podía no cargarla. Se envolvió en un bloque `>-` sin cambiar el texto. Anotado en `FUENTES.md`.

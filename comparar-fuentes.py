@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Compara FUENTES.md con los repos de origen. Solo lee: no cambia nada, no pide claves.
-Uso (desde la carpeta del repo):  python3 -I comparar-fuentes.py [FUENTES.md]
+Uso (desde la carpeta del repo):  python -I comparar-fuentes.py [FUENTES.md]
 Para cada fila con un repo de origen y un commit copiado, pregunta a GitHub cuál es el commit más
 nuevo de la rama principal (git ls-remote) y dice si cambió. Salida: 0 todo igual, 1 hay cambios,
 2 no se pudo consultar alguno. Si existe skills/apis-gratis, avisa si su tabla de límites tiene más

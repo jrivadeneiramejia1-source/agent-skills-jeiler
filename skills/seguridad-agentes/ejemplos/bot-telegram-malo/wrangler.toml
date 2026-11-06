@@ -1,0 +1,4 @@
+name = "bot-malo"
+main = "src/index.ts"
+[vars]
+WEBHOOK_SECRET = "una-clave-escrita-aqui"

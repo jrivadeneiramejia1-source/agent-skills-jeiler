@@ -3,8 +3,8 @@ MIT License
 Copyright (c) 2026 jrivadeneiramejia1-source
 
 Esta licencia cubre SOLO las skills originales escritas para este repositorio:
-probar-prompts, seguridad-agentes, apis-gratis, bot-telegram, plantillas-n8n y
-whatsapp-cloud-api, además de instalar.sh, los archivos grupos*.* y los documentos
+probar-prompts, seguridad-agentes, apis-gratis, bot-telegram, plantillas-n8n,
+whatsapp-cloud-api y revisar-flujo-n8n, además de instalar.sh, los archivos grupos*.* y los documentos
 FUENTES.md, SEGURIDAD.md e INDICE-DE-SKILLS.md.
 
 NO cubre el resto del repositorio: las skills heredadas del fork de Vercel y las
