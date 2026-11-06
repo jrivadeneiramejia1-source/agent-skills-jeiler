@@ -6,7 +6,7 @@ Las copias de los repos propios (forks) pueden ir atrasadas frente al original. 
 | Skills | Origen | Commit copiado | Fecha | Licencia |
 |---|---|---|---|---|
 | 14 `n8n-*` y `using-n8n-mcp-skills` | czlonkowski/n8n-skills | e037563 | 2026-10-24 | MIT |
-| `crear-agente` | santmun/crear-agente (**modificada**: la `description` pasó a bloque `>-` para que el YAML sea válido; el texto es el mismo) | 9c5d246 | 2026-07-09 | MIT |
+| `crear-agente` | santmun/crear-agente (**modificada**: la `description` pasó a bloque `>-` para que el YAML sea válido y se acortó de 1.166 a 888 caracteres (límite de 1.024); sin cambiar su sentido) | 9c5d246 | 2026-07-09 | MIT |
 | `mcp-builder` | anthropics/skills | ca45fc4 | 2026-10-28 | Apache-2.0 |
 | 7 de Firebase | firebase/agent-skills | b76be96 | 2026-11-03 | Apache-2.0 |
 | `gemini-api-dev`, `gemini-live-api-dev` | google-gemini/gemini-skills | e1f29de | 2026-11-03 | Apache-2.0 |

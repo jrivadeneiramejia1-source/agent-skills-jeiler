@@ -31,6 +31,11 @@ Solo se listan las skills originales de este repo. Las demás son copias de terc
 | gitleaks sobre el **historial completo** (287 commits) | `gitleaks detect --log-opts=--all` | 6 hallazgos, todos ejemplos ficticios: los 5 de antes y un texto viejo de `SEGURIDAD.md` que citaba el ejemplo (ya reescrito). Ninguno real. |
 | Pruebas del repo | `python -I -m unittest discover -s tests` | 32 pruebas pasan. |
 
+### Hallazgo en un flujo heredado de Vercel (2026-11-06)
+Al abrir el PR, el flujo heredado **«Agent Skills Discovery»** (`agent-skills-discovery.yml`, parte de la maquinaria de publicación del fork de Vercel) **falló**. Reproducido en local con `node scripts/build-discovery-index.mjs`:
+1. `crear-agente` (tercero) tenía una `description` de 1.166 caracteres y el límite de la especificación es **1.024** → acortada a 888 (mismo sentido; anotado en `FUENTES.md`). Ahora hay una prueba que revisa las 48 skills.
+2. Después falla con `ENOBUFS`: `crear-agente` pesa 2,1 MB (la imagen `assets/cover.png` mide 1,7 MB) y el script solo admite 1 MB por skill. **No se tocó el script heredado.** Pendiente de decidir: desactivar ese flujo (el fork no publica un índice de skills), subir el límite en el script o quitar la imagen.
+
 ### Qué no se probó (revisores)
 - Con un flujo exportado de **tu** n8n: el ejemplo es hecho a mano con la forma del archivo exportado; la medición con 2.061 flujos reales confirma los nombres de campos, pero no tu versión.
 - El revisor de bots busca patrones de texto: no sabe si la lista de usuarios se aplica de verdad ni si la comparación es correcta.
