@@ -57,6 +57,9 @@ Desde un flujo o un Worker, el bot puede enviarse un mensaje a sí mismo con el 
 - **Probado el 2026-11-04** con el esqueleto de arriba corriendo en el motor local de Cloudflare (`wrangler dev` 4.157, grammY con `cloudflare-mod`, `botInfo` y `secretToken`): sin la clave secreta o con una equivocada, el Worker responde **401** y no procesa nada; con la clave correcta y un usuario que no está en la lista, responde 200 y no contesta; con la clave y un usuario permitido, intenta contestar con `sendMessage` (en la prueba falló solo porque no había salida a Telegram). Cualquier petición sin la clave, incluso un GET, da 401.
 - **No probado:** el Worker publicado en Cloudflare, el registro real del webhook con `setWebhook` y una conversación real con Telegram (necesitan un token real, que se queda en manos del usuario). Ojo: si Telegram no responde y el Worker da 500, Telegram reintenta el mensaje varias veces.
 
+## Revisar el bot
+Antes de publicar: `python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT` (ver `seguridad-agentes`). Comprueba `secret_token`, lista de usuarios y que no haya claves escritas. Se probó con este mismo esqueleto: sale sin hallazgos graves.
+
 ## Señales de alerta
 - El token pegado en el chat, en el código o en un archivo del repositorio.
 - Un bot que responde a cualquiera.

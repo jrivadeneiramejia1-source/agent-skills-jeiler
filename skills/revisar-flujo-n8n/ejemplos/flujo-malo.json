@@ -1,0 +1,153 @@
+{
+  "name": "EJEMPLO malo: hecho a proposito con todos los errores",
+  "nodes": [
+    {
+      "id": "id-1",
+      "name": "Mensaje de Telegram",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      }
+    },
+    {
+      "id": "id-2",
+      "name": "Agente",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "text": "={{ $json.message.text }}"
+      }
+    },
+    {
+      "id": "id-3",
+      "name": "Ejecutar orden",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "command": "={{ $json.output }}"
+      }
+    },
+    {
+      "id": "id-4",
+      "name": "Enviar correo",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 1,
+      "position": [
+        440,
+        120
+      ],
+      "parameters": {
+        "sendTo": "persona.inventada@ejemplo.invalid",
+        "message": "hola"
+      }
+    },
+    {
+      "id": "id-5",
+      "name": "Webhook abierto",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "parameters": {
+        "path": "abierto",
+        "authentication": "none"
+      }
+    },
+    {
+      "id": "id-6",
+      "name": "Avisar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        220,
+        240
+      ],
+      "parameters": {
+        "url": "http://api.ejemplo.invalid/bot000000000:FAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAK/sendMessage",
+        "options": {
+          "allowUnauthorizedCerts": true
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer abcdefghijklmnopqrstuvwxyz0123456789"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "id-7",
+      "name": "Codigo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        440,
+        240
+      ],
+      "parameters": {
+        "jsCode": "const cp = require('child_process'); return eval($json.output);"
+      },
+      "disabled": false
+    },
+    {
+      "id": "id-8",
+      "name": "Nodo viejo",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        240
+      ],
+      "parameters": {},
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Mensaje de Telegram": {
+      "main": [
+        [
+          {
+            "node": "Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Mensaje de Telegram": [
+      {
+        "json": {
+          "message": {
+            "text": "dato guardado de prueba"
+          }
+        }
+      }
+    ]
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

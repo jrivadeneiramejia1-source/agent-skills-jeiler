@@ -1,6 +1,6 @@
 # Índice de skills agregadas (para saber cuándo usar cada una)
 
-**Instalarlas:** `./instalar.sh --lista` muestra los grupos y `./instalar.sh n8n firebase` instala los que elijas. En sesiones en la nube se instalan solos los grupos de `grupos-activos.txt` (hoy: `n8n` y `agentes-cloudflare`). Origen y versión de cada skill: `FUENTES.md`. Revisión de seguridad: `SEGURIDAD.md`.
+**Instalarlas:** `bash instalar.sh --lista` muestra los grupos y `bash instalar.sh n8n firebase` instala los que elijas. En sesiones en la nube se instalan solos los grupos de `grupos-activos.txt` (hoy: `n8n` y `agentes-cloudflare`). Origen y versión de cada skill: `FUENTES.md`. Revisión de seguridad: `SEGURIDAD.md`.
 
 Todas son de terceros, con licencia libre (MIT o Apache-2.0). Cada carpeta de origen trae su licencia en `third-party/`.
 No se probó ninguna en una tarea real; solo se verificó que el archivo `SKILL.md` es válido y que no tiene comandos de riesgo.
@@ -22,6 +22,7 @@ Origen: czlonkowski/n8n-skills (MIT). Entrada: `using-n8n-mcp-skills`.
 | n8n-validation-expert | Entender errores y avisos de validación. |
 | n8n-binary-and-data | Archivos, imágenes, PDF. |
 | n8n-mcp-tools-expert | Usar las herramientas de n8n-mcp. |
+| **revisar-flujo-n8n** (original) | Revisar un flujo exportado: claves escritas, webhooks abiertos, bot sin filtro de usuario, sin manejo de errores. Trae revisor automático. |
 | n8n-multi-instance | Más de una instancia de n8n. |
 | n8n-self-hosting | Instalar n8n propio con Docker. |
 | **plantillas-n8n** (original) | Partir de un flujo ya hecho: buscar en una biblioteca de unos 2.000 flujos, limpiarlo y adaptarlo. |
@@ -73,7 +74,7 @@ Origen: google-gemini/gemini-skills (Apache-2.0).
 | Skill | Cuándo usarla |
 |---|---|
 | **probar-prompts** | Probar un prompt con casos normales, ambiguos y de engaño, con promptfoo. |
-| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. |
+| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. Trae `revisar_bot.py` para bots de Telegram y WhatsApp. |
 
 ## APIs y mensajería (originales)
 | Skill | Cuándo usarla |

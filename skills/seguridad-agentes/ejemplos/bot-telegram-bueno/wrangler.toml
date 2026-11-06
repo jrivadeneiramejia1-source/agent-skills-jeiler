@@ -1,0 +1,6 @@
+name = "bot-ejemplo"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+# Los secretos (BOT_TOKEN, BOT_INFO, WEBHOOK_SECRET) se guardan con: wrangler secret put NOMBRE
+[vars]
+USUARIOS_PERMITIDOS = "111111111"
