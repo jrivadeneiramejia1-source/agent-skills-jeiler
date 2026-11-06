@@ -74,7 +74,7 @@ Origen: google-gemini/gemini-skills (Apache-2.0).
 | Skill | Cuándo usarla |
 |---|---|
 | **probar-prompts** | Probar un prompt con casos normales, ambiguos y de engaño, con promptfoo. |
-| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. Trae `revisar_bot.py` para bots de Telegram y WhatsApp. |
+| **seguridad-agentes** | Revisar la seguridad de un agente antes de conectarlo a correo, archivos o mensajes. Trae `revisar_bot.py` (lee el código) y `probar_webhook.py` (le escribe al bot corriendo con mensajes falsos). |
 
 ## APIs y mensajería (originales)
 | Skill | Cuándo usarla |

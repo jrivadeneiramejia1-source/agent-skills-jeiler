@@ -1,3 +1,6 @@
+# DESACTIVADO el 2026-11-06 a pedido de Jeiler: es de la maquinaria de publicación del fork de Vercel y fallaba
+# (crear-agente pesa 2,1 MB y este script admite 1 MB por skill). GitHub solo lee archivos .yml/.yaml:
+# para reactivarlo, quitar «.desactivado» del nombre (y resolver antes lo del tamaño).
 name: Agent Skills Discovery
 
 on:

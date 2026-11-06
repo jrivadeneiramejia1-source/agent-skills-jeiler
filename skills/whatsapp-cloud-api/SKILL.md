@@ -38,6 +38,9 @@ Las que se conectan como «WhatsApp Web» (por ejemplo Baileys o whatsapp-web.js
 ## Revisar el bot
 `python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT` avisa si falta la firma `X-Hub-Signature-256`, la comparación de tiempo constante o el `hub.verify_token`. En `skills/seguridad-agentes/ejemplos/bot-whatsapp-bueno/` hay una verificación de firma con HMAC probada con 8 casos (firma buena, cuerpo alterado, secreto distinto, encabezado ausente o mal formado).
 
+## Probar el bot corriendo
+`python -I skills\seguridad-agentes\scripts\probar_webhook.py whatsapp http://127.0.0.1:8787/ --app-secret SECRETO-DE-PRUEBA --verify-token PALABRA --permitido 570000000000` (con el bot en `wrangler dev` y claves inventadas). Hace 11 comprobaciones: verificación del reto, firma ausente, de otro secreto, con el cuerpo alterado o mal formada, número fuera de la lista, repetición del mismo evento y cuerpo roto. El ejemplo `bot-whatsapp-bueno` pasa 11 de 11 en un Worker local real (2026-11-06); en la primera pasada devolvía 500 con un cuerpo roto pero bien firmado (un 5xx hace que Meta reintente): ahora devuelve 400.
+
 ## Qué no se probó
 Nada de esto se probó con una cuenta real de WhatsApp: la skill resume la documentación y no se ejecutó contra la API.
 

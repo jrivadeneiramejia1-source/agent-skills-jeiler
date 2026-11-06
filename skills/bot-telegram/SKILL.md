@@ -44,7 +44,16 @@ export default {
     bot.command("start", (ctx) => ctx.reply("Hola, estoy listo."));
     bot.on("message:text", (ctx) => ctx.reply("Recibí: " + ctx.message.text));
 
-    return webhookCallback(bot, "cloudflare-mod", { secretToken: env.WEBHOOK_SECRET })(request);
+    const atender = webhookCallback(bot, "cloudflare-mod", { secretToken: env.WEBHOOK_SECRET });
+    try {
+      return await atender(request);
+    } catch (e) {
+      // Si algo falla al contestar (por ejemplo Telegram no responde), anotar solo el motivo (nunca el mensaje)
+      // y devolver 200: con un 500, Telegram reintenta el mismo mensaje muchas veces.
+      // (bot.catch no sirve aquí: con webhooks, grammY deja pasar el error.)
+      console.error("error del bot:", (e as Error).message);
+      return new Response("ok", { status: 200 });
+    }
   },
 };
 ```
@@ -55,7 +64,18 @@ Desde un flujo o un Worker, el bot puede enviarse un mensaje a sí mismo con el 
 ## Qué se probó y qué no
 - **Probado** (sin internet, con grammY y llamadas a Telegram simuladas): la lista de permitidos responde a un usuario permitido y ignora a uno desconocido, y el comando `/start` responde.
 - **Probado el 2026-11-04** con el esqueleto de arriba corriendo en el motor local de Cloudflare (`wrangler dev` 4.157, grammY con `cloudflare-mod`, `botInfo` y `secretToken`): sin la clave secreta o con una equivocada, el Worker responde **401** y no procesa nada; con la clave correcta y un usuario que no está en la lista, responde 200 y no contesta; con la clave y un usuario permitido, intenta contestar con `sendMessage` (en la prueba falló solo porque no había salida a Telegram). Cualquier petición sin la clave, incluso un GET, da 401.
+- **Probado el 2026-11-06** (wrangler 4.158.0, grammY 1.46.0, Worker local real) con `probar_webhook.py`: 7 de 7. Esa prueba encontró un fallo del esqueleto anterior: si Telegram no respondía al enviar el mensaje, el Worker daba **500** (Telegram habría reintentado). Se arregló con el `try/catch` de arriba; `bot.catch` **no** sirve con webhooks (se probó y seguía dando 500).
 - **No probado:** el Worker publicado en Cloudflare, el registro real del webhook con `setWebhook` y una conversación real con Telegram (necesitan un token real, que se queda en manos del usuario). Ojo: si Telegram no responde y el Worker da 500, Telegram reintenta el mensaje varias veces.
+
+## Datos de la guía oficial de webhooks de Telegram [F]
+(core.telegram.org/bots/webhooks, consultada el 2026-11-06.) Puertos permitidos: 443, 80, 88 y 8443. Solo IPv4. Exige TLS 1.2 o más. Telegram envía desde `149.154.160.0/20` y `91.108.4.0/22` (la guía avisa que pueden cambiar). Cloudflare Workers ya cumple todo esto; **no hace falta filtrar por IP**: el `secret_token` ya identifica a Telegram, y filtrar por una lista que puede cambiar solo agrega fallos.
+
+## Probar el bot corriendo (con mensajes falsos)
+Con el bot en marcha en tu computador (`wrangler dev`, con claves de prueba inventadas en `.dev.vars`, nunca las reales):
+```
+python -I skills\seguridad-agentes\scripts\probar_webhook.py telegram http://127.0.0.1:8787/ --secreto CLAVE-DE-PRUEBA --permitido 111111111
+```
+Comprueba 7 cosas: rechaza sin clave y con clave equivocada, rechaza un GET, no responde a usuarios fuera de la lista, y **no devuelve 5xx** ni con usuario permitido, ni con cuerpo roto, ni con cuerpo enorme (un 5xx hace que Telegram reintente el mismo mensaje). Ver `seguridad-agentes`.
 
 ## Revisar el bot
 Antes de publicar: `python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT` (ver `seguridad-agentes`). Comprueba `secret_token`, lista de usuarios y que no haya claves escritas. Se probó con este mismo esqueleto: sale sin hallazgos graves.

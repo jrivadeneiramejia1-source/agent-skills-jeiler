@@ -23,6 +23,11 @@ except ImportError:
     yaml = None
 
 
+def encoding_(skill_md):
+    m = re.match(r"^---\r?\n([\s\S]*?)\r?\n---", skill_md.read_text(encoding="utf-8"))
+    return m.group(1) if m else ""
+
+
 def encabezado(skill_md):
     t = skill_md.read_text(encoding="utf-8")
     m = re.match(r"^---\n(.*?)\n---\n", t, re.S)
@@ -57,6 +62,16 @@ class TestEstructura(unittest.TestCase):
                 except yaml.YAMLError as e:
                     self.fail(f"{s}: el encabezado no es YAML válido ({str(e)[:80]})")
                 self.assertTrue(datos.get("description"), s)
+
+    @unittest.skipIf(yaml is None, "PyYAML no está instalado (pip install pyyaml)")
+    def test_todas_las_skills_cumplen_los_limites_de_la_especificacion(self):
+        """Las mismas reglas que valida scripts/build-discovery-index.mjs: nombre en minúsculas con guiones (≤64) y description ≤1024."""
+        for md in sorted(SKILLS.glob("*/SKILL.md")):
+            datos = yaml.safe_load(encoding_(md))
+            nombre, desc = datos.get("name"), datos.get("description")
+            self.assertRegex(nombre, r"^[a-z0-9]+(?:-[a-z0-9]+)*$", md.parent.name)
+            self.assertLessEqual(len(nombre), 64, md.parent.name)
+            self.assertTrue(isinstance(desc, str) and 0 < len(desc) <= 1024, f"{md.parent.name}: description de {len(desc or '')} caracteres (máximo 1024)")
 
     def test_originales_estan_en_algun_grupo_o_son_de_vercel(self):
         en_grupos = {s for lista in grupos().values() for s in lista}
@@ -99,7 +114,7 @@ class TestSinDatosPersonales(unittest.TestCase):
             for m in self.CORREO.findall(t):
                 self.assertTrue(any(o in m for o in self.OK_CORREO), f"{p.relative_to(RAIZ)}: correo {m}")
             for m in self.TELEFONO.findall(t):
-                self.assertEqual(m, "570000000000", f"{p.relative_to(RAIZ)}: teléfono parecido")
+                self.assertRegex(m, r"^5700000000\d\d$", f"{p.relative_to(RAIZ)}: teléfono parecido a uno real (los inventados son 5700000000NN)")
 
     def test_documentos_usan_python_no_python3(self):
         for p in self.archivos_originales():

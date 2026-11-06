@@ -6,7 +6,7 @@ Las copias de los repos propios (forks) pueden ir atrasadas frente al original. 
 | Skills | Origen | Commit copiado | Fecha | Licencia |
 |---|---|---|---|---|
 | 14 `n8n-*` y `using-n8n-mcp-skills` | czlonkowski/n8n-skills | e037563 | 2026-10-24 | MIT |
-| `crear-agente` | santmun/crear-agente (**modificada**: la `description` pasó a bloque `>-` para que el YAML sea válido; el texto es el mismo) | 9c5d246 | 2026-07-09 | MIT |
+| `crear-agente` | santmun/crear-agente (**modificada**: la `description` pasó a bloque `>-` para que el YAML sea válido y se acortó de 1.166 a 888 caracteres (límite de 1.024); sin cambiar su sentido) | 9c5d246 | 2026-07-09 | MIT |
 | `mcp-builder` | anthropics/skills | ca45fc4 | 2026-10-28 | Apache-2.0 |
 | 7 de Firebase | firebase/agent-skills | b76be96 | 2026-11-03 | Apache-2.0 |
 | `gemini-api-dev`, `gemini-live-api-dev` | google-gemini/gemini-skills | e1f29de | 2026-11-03 | Apache-2.0 |
@@ -22,3 +22,14 @@ python -I comparar-fuentes.py
 Es de solo lectura: compara cada commit de esta tabla con el más nuevo del repo de origen y dice «igual» o «HAY CAMBIOS» (o no pudo consultar). Salida 0 = todo igual, 1 = hay cambios, 2 = no se pudo consultar alguno. Que haya cambios no obliga a actualizar: primero mirar qué cambió, volver a revisar su seguridad (`SEGURIDAD.md`) y actualizar la fila de esta tabla. Probado el 2026-11-04.
 
 También avisa cuando la tabla de límites de `apis-gratis` tiene 3 meses o más: ahí hay que volver a verificar los planes gratuitos en las páginas oficiales.
+
+## Herramientas externas que se usan pero NO se copian al repo
+| Herramienta | Versión | Licencia | Para qué | Cómo se verificó |
+|---|---|---|---|---|
+| valn8n (DrMicrobit/valn8n) | 0.1.1 | MIT | Revisar la estructura de un flujo de n8n (opcional) | Código fuente leído con búsqueda de riesgos; instalada aparte |
+| wrangler / workerd (Cloudflare) | 4.158.0 / 1.20261104.1 | MIT o Apache-2.0 / Apache-2.0 | Correr un bot en local para probarlo | Licencia leída en su `package.json` |
+| grammy | 1.46.0 | MIT | Librería del bot de ejemplo | Licencia en su `package.json` |
+| actionlint (rhysd/actionlint) | 1.7.12 | MIT | Errores de escritura en flujos de GitHub Actions | Huella SHA-256 del binario comparada con la lista oficial |
+| zizmor (zizmorcore/zizmor) | 1.32.0 | MIT | Seguridad de flujos de GitHub Actions | Licencia en PyPI; se usa con `--offline` |
+| gitleaks | 8.30.0 | MIT | Claves escritas en archivos e historial | Huella SHA-256 verificada |
+| REA (tu fork `rea.-`, morluto/rea) | 6.5.0 | MIT | Mirar páginas por dentro (se usó para probar los revisores de PWA, en `app-skills-jeiler`) | Construido en una copia temporal; el repo no se modificó |

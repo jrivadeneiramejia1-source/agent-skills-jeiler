@@ -1,0 +1,28 @@
+# Corre las pruebas del repo en cada pull request y en main (repo público: sin costo de minutos).
+# Revisado con actionlint y zizmor (ver verificar-apk/plantilla/revisar-flujos.yml en apk-skills-jeiler).
+name: Pruebas
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pruebas-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pruebas:
+    name: Pruebas del repo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # actions/checkout v7.0.1 (commit fijo)
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Pruebas (solo Python estándar; las de Node se saltan si no hay Node)
+        run: python3 -I -m unittest discover -s tests
