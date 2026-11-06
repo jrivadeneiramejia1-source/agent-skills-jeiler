@@ -29,3 +29,9 @@ Hecha el 2026-11-04.
 - Los ejemplos malos traen un token inventado (`000000000:FAKEFAKE…`) a propósito para probar los revisores; no es una clave real.
 - Se borraron 5 `.zip` repetidos de `skills/` (copias empaquetadas de carpetas que ya estaban). El historial de git los conserva.
 - `crear-agente` (de terceros): la línea `description` no era YAML válido (tenía «Stack base: …» sin comillas), así que un lector estricto podía no cargarla. Se envolvió en un bloque `>-` sin cambiar el texto. Anotado en `FUENTES.md`.
+
+## Fase 4 (2026-11-06, segunda ronda)
+- Herramientas de terceros que se **usaron** (no se copiaron al repo): `valn8n` 0.1.1 (MIT) tras leer su código (0 coincidencias de red/ejecución) en un entorno aparte; `wrangler` 4.158.0 (MIT o Apache-2.0), `workerd` 1.20261104.1 (Apache-2.0) y `grammy` 1.46.0 (MIT) solo para correr bots de ejemplo en local con claves inventadas; `actionlint` 1.7.12 (MIT, binario con huella SHA-256 verificada contra la lista oficial) y `zizmor` 1.32.0 (MIT, `--offline`). Detalle en `FUENTES.md`.
+- **gitleaks sobre el historial completo** (287 commits): 6 hallazgos, todos ejemplos ficticios (ver `PRUEBAS.md`).
+- `probar_webhook.py` solo habla con direcciones locales salvo `--permitir-remoto` (para bots del propio usuario) y no guarda ni imprime las claves que recibe.
+- Nuevo `.github/workflows/pruebas.yml`: corre las pruebas sin secretos, con permisos de solo lectura, `actions/checkout` fijado a commit y `persist-credentials: false`.

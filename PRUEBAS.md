@@ -20,6 +20,17 @@ Solo se listan las skills originales de este repo. Las demás son copias de terc
 | Pruebas del repo (`tests/`) | `python -I -m unittest discover -s tests`: grupos apuntan a skills que existen, encabezados YAML válidos, sin zips repetidos, sin correos ni teléfonos reales, documentos con `python` y no `python3`, revisores | 25 pruebas, todas pasan. |
 | Las pruebas detectan fallas | Se rompió a propósito la regla F07 y, aparte, el filtro de comentarios y la regla de `secret_token` | En cada caso fallaron 2 pruebas (bien) y se restauró. |
 
+## Herramientas nuevas y pruebas en vivo (2026-11-06, segunda ronda)
+| Qué | Cómo | Resultado |
+|---|---|---|
+| **probar_webhook.py** (nuevo, en `seguridad-agentes`) | Se le manda mensajes falsos a un bot **corriendo**. Contra Workers reales locales (`wrangler dev` 4.158.0, grammY 1.46.0, claves inventadas) | Telegram bueno: 7 de 7. WhatsApp bueno: 11 de 11. Telegram malo (sin clave, sin lista): 0 de 7. WhatsApp malo (sin firma): 4 de 11. |
+| Lo que encontró en mis propios ejemplos | Telegram: si Telegram fallaba al contestar, el Worker daba **500** (Telegram reintenta). `bot.catch` no lo arregla con webhooks (se probó): se arregló con `try/catch` alrededor del webhook. WhatsApp: cuerpo roto pero bien firmado daba 500; ahora 400. | Corregidos en `bot-telegram-bueno`, `bot-whatsapp-bueno` y en el esqueleto de `bot-telegram`. |
+| Pruebas del probador | `tests/test_probar_webhook.py`: bots de mentira (Python) correctos y malos; direcciones remotas sin permiso → salida 2; bot apagado → salida 2 con mensaje claro; argumentos incompletos | 7 pruebas pasan. |
+| **valn8n 0.1.1** (herramienta de terceros, MIT) sobre mis ejemplos de n8n | Revisión de su código (0 usos de red ni de ejecución), instalada en un entorno aparte | Complementa a `revisar_flujo.py` (estructura, no seguridad). Descubrió un fallo de mi `flujo-bueno.json` (IF con `typeVersion` 1 y formato nuevo): corregido. Ver `skills/revisar-flujo-n8n/references/herramientas.md`. |
+| **actionlint 1.7.12 y zizmor 1.32.0** (MIT) sobre los flujos de este repo | `.github/workflows/` heredados de Vercel y el nuevo `pruebas.yml` | Nuevo `pruebas.yml`: 0 hallazgos con ambos (incluso con zizmor en modo pedante). Los heredados de Vercel: actionlint 0; zizmor 5 `unpinned-uses`, 3 `artipacked` y 1 `excessive-permissions` (**no se tocaron**: son de Vercel). |
+| gitleaks sobre el **historial completo** (287 commits) | `gitleaks detect --log-opts=--all` | 6 hallazgos, todos ejemplos ficticios: los 5 de antes y un texto viejo de `SEGURIDAD.md` que citaba el ejemplo (ya reescrito). Ninguno real. |
+| Pruebas del repo | `python -I -m unittest discover -s tests` | 32 pruebas pasan. |
+
 ### Qué no se probó (revisores)
 - Con un flujo exportado de **tu** n8n: el ejemplo es hecho a mano con la forma del archivo exportado; la medición con 2.061 flujos reales confirma los nombres de campos, pero no tu versión.
 - El revisor de bots busca patrones de texto: no sabe si la lista de usuarios se aplica de verdad ni si la comparación es correcta.

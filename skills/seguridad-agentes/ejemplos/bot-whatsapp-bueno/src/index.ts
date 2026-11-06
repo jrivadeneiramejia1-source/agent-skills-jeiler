@@ -23,7 +23,13 @@ export default {
       return new Response("firma inválida", { status: 401 });
     }
     const permitidos = env.NUMEROS_PERMITIDOS.split(",");
-    const msg = JSON.parse(cuerpo)?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    let datos: any;
+    try {
+      datos = JSON.parse(cuerpo);
+    } catch {
+      return new Response("cuerpo no válido", { status: 400 }); // un 5xx haría que Meta reintente
+    }
+    const msg = datos?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     if (msg && permitidos.includes(msg.from) && !(await env.VISTOS.get(msg.id))) {
       await env.VISTOS.put(msg.id, "1", { expirationTtl: 86400 });
       // ... aquí va la lógica del bot

@@ -33,6 +33,14 @@ python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT
 ```
 Avisa: claves escritas, variables secretas en `wrangler.toml`, `.env` sin ignorar, falta de `secret_token` (Telegram), falta de lista de usuarios, falta de la firma `X-Hub-Signature-256` (WhatsApp), `hub.challenge` sin `hub.verify_token`, registro del mensaje completo y uso de `eval`/`exec`. Salida 0/1/2 como el revisor de n8n. Solo lee texto, no imprime claves y busca patrones: **no prueba** que el bot sea seguro. Los flujos de n8n se revisan con `revisar-flujo-n8n`. Ejemplos bueno y malo en `ejemplos/`.
 
+## Probar un bot que ya corre (mensajes falsos a un Worker local)
+`revisar_bot.py` lee el código; **`probar_webhook.py` le escribe al bot** y mira qué contesta. Solo habla con direcciones locales (`localhost`, `127.0.0.1`) salvo que agregues `--permitir-remoto` para un bot tuyo ya publicado; usa claves de prueba inventadas, no las reales. Solo biblioteca estándar de Python.
+```
+python -I skills\seguridad-agentes\scripts\probar_webhook.py telegram http://127.0.0.1:8787/ --secreto CLAVE-DE-PRUEBA --permitido 111111111
+python -I skills\seguridad-agentes\scripts\probar_webhook.py whatsapp http://127.0.0.1:8787/ --app-secret SECRETO-DE-PRUEBA --verify-token PALABRA --permitido 570000000000
+```
+Salida 0 = todo PASA; 1 = algo FALLA; 2 = no pudo probar (el bot no responde, dirección remota sin permiso, faltan datos). Lo que no se ve desde afuera (si el bot contestó o procesó el pedido) se marca INFO. Medido en Workers locales reales: los bots buenos pasan 7/7 (Telegram) y 11/11 (WhatsApp); los malos fallan 7 de 7 y 7 de 11.
+
 ## Informe
 Tabla con tres columnas: **Riesgo**, **Qué encontré** y **Arreglo propuesto**, con gravedad (alta, media, baja). Al final: qué no se pudo probar.
 

@@ -26,15 +26,21 @@
       "id": "id-2",
       "name": "Solo mi usuario",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
+      "typeVersion": 2.2,
       "position": [
         220,
         0
       ],
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
+              "id": "cond-1",
               "leftValue": "={{ $json.message.from.id }}",
               "rightValue": 111111111,
               "operator": {
@@ -42,7 +48,8 @@
                 "operation": "equals"
               }
             }
-          ]
+          ],
+          "combinator": "and"
         }
       }
     },

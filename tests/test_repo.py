@@ -99,7 +99,7 @@ class TestSinDatosPersonales(unittest.TestCase):
             for m in self.CORREO.findall(t):
                 self.assertTrue(any(o in m for o in self.OK_CORREO), f"{p.relative_to(RAIZ)}: correo {m}")
             for m in self.TELEFONO.findall(t):
-                self.assertEqual(m, "570000000000", f"{p.relative_to(RAIZ)}: teléfono parecido")
+                self.assertRegex(m, r"^5700000000\d\d$", f"{p.relative_to(RAIZ)}: teléfono parecido a uno real (los inventados son 5700000000NN)")
 
     def test_documentos_usan_python_no_python3(self):
         for p in self.archivos_originales():

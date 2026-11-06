@@ -21,7 +21,9 @@ Revisan un archivo y avisan errores. Corren igual en Windows y en la nube; no ab
 ```
 python -I skills\revisar-flujo-n8n\scripts\revisar_flujo.py MI-FLUJO.json
 python -I skills\seguridad-agentes\scripts\revisar_bot.py CARPETA-DEL-BOT
+python -I skills\seguridad-agentes\scripts\probar_webhook.py telegram http://127.0.0.1:8787/ --secreto CLAVE-DE-PRUEBA --permitido 111111111
 ```
+El segundo **le escribe a un bot que está corriendo** en tu computador (`wrangler dev`, con claves de prueba inventadas) y comprueba que rechaza lo que debe y que no devuelve error 5xx.
 Salida 0 = sin problemas graves, 1 = hay hallazgos graves. Aviso: buscan patrones; que salgan limpios **no** prueba que el agente sea seguro.
 
 ## Instalar
