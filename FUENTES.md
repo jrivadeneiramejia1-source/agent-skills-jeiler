@@ -13,7 +13,7 @@ Las copias de los repos propios (forks) pueden ir atrasadas frente al original. 
 | 6 de Cloudflare | cloudflare/skills | 1f2cd0a | 2026-11-03 | Apache-2.0 |
 | Skills originales de Vercel (heredadas del fork) | vercel-labs/agent-skills | 063bee9 | 2026-08-28 | Cada skill declara la suya; el repo de origen no trae LICENSE |
 
-Originales de este repo (licencia MIT, ver `LICENSE-originales`): `revisar-flujo-n8n`, `probar-prompts`, `seguridad-agentes`, `apis-gratis`, `bot-telegram`, `plantillas-n8n`, `whatsapp-cloud-api`.
+Originales de este repo (licencia MIT, ver `LICENSE-originales`): `revisar-flujo-n8n`, `probar-prompts`, `seguridad-agentes`, `apis-gratis`, `bot-telegram`, `plantillas-n8n`, `whatsapp-cloud-api`, `agente-youtube-infantil`.
 
 ## Revisar si hay versiones nuevas (cada mes)
 ```bash
@@ -33,3 +33,5 @@ También avisa cuando la tabla de límites de `apis-gratis` tiene 3 meses o más
 | zizmor (zizmorcore/zizmor) | 1.32.0 | MIT | Seguridad de flujos de GitHub Actions | Licencia en PyPI; se usa con `--offline` |
 | gitleaks | 8.30.0 | MIT | Claves escritas en archivos e historial | Huella SHA-256 verificada |
 | REA (tu fork `rea.-`, morluto/rea) | 6.5.0 | MIT | Mirar páginas por dentro (se usó para probar los revisores de PWA, en `app-skills-jeiler`) | Construido en una copia temporal; el repo no se modificó |
+| n8n 2.46.6 (n8n.io) | 2.46.6 | «Sustainable Use» (código visible; **no** es una licencia abierta de la lista) | Importar y validar las plantillas de `agente-youtube-infantil` y correr un nodo «Code» de verdad | Instalado en una carpeta temporal fuera del repo, sin cuentas ni claves; **no se copió código suyo**, solo se leyeron nombres de campos |
+| Node.js 24 (paquete `node` de npm) | 24.22.2 | MIT | n8n 2.46.6 no arranca con Node 22 | Instalado aparte, solo para la prueba |

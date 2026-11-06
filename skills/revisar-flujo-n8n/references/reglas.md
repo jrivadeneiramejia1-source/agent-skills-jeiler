@@ -17,6 +17,9 @@ Fuentes consultadas el 2026-11-06 (ver `fuentes.md`). No se copió texto de ella
 | F09 | No aceptar certificados inválidos; no usar `http://` fuera de la máquina local. | [P] | Regla general. |
 | F10 | Correos y teléfonos reales no van en un repo público. | [E] | La misma medición: 286 de 2.061 flujos traían correos escritos. |
 | F11 | Un flujo exportado `active: true` se enciende al importarlo. | [E] | Medición: 217 de 2.061 plantillas estaban activas. |
+| F12 | Una subida a YouTube debe fijar `privacyStatus` en `private`; el paso a público se hace después, con aprobación. | [E] | Probada con un flujo bueno y uno malo (`agente-youtube-infantil/ejemplos`). Sin el campo, el nodo no manda privacidad. |
+| F13 | Declarar `selfDeclaredMadeForKids`: el nodo solo lo manda si lo marcas (y en «update» solo si es `true`). | [E] | Lectura del código del nodo YouTube de n8n 2.46.6; probada con flujo bueno y malo. |
+| F14 | Un nodo que pone `public` debe estar detrás de «sendAndWait» y un IF, sin otro camino que lo rodee. | [E] | Probada con 3 formas de saltarse la aprobación. Mira la forma del flujo, **no** lo que compara el IF. |
 
 ## Límites del revisor
 - Busca patrones de texto. No sabe si un nodo IF realmente bloquea a los demás: solo ve que existe uno que menciona `from.id`.

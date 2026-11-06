@@ -1,0 +1,563 @@
+{
+  "name": "Subir a YouTube con aprobación (privado primero)",
+  "nodes": [
+    {
+      "id": "6c060397-3387-5c54-a33b-975435ab21b0",
+      "name": "Léeme",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        -80
+      ],
+      "parameters": {
+        "content": "## Subidor con aprobación\nEscribes **/subir 1**, **/subir 2** o **/subir 3** a tu bot de Telegram. Lee `publicacion.json` y `video.mp4` de esa carpeta, lo sube a YouTube **en privado y marcado «para niños»** (fijo en el código) y te pregunta si lo publica. Solo se hace público si pulsas «Publicar».\n\n**Antes de activarlo:**\n1. Credenciales de Telegram y de YouTube (OAuth).\n2. Edita tu número de chat y la carpeta SOLO en el nodo «Solo tu chat y /subir N» (en ningún otro lado).\n3. Pon n8n detrás de ngrok con `N8N_WEBHOOK_URL`.\n4. Las carpetas 1, 2 y 3 deben estar dentro de `~/.n8n-files` (n8n 2.x).\n5. Elige el flujo de errores en Settings → Error workflow.",
+        "height": 420,
+        "width": 470
+      }
+    },
+    {
+      "id": "3de0c91a-b3dc-516f-ba90-ebe8d17173d3",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      },
+      "webhookId": "65d72e00-9448-5d9c-bf0e-033f0c6a52ac"
+    },
+    {
+      "id": "a8f13292-fcc1-55f8-8ae1-376fe016eff3",
+      "name": "Solo tu chat y /subir N",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// SOLO TU CHAT Y /subir N\n// 1) Descarta (en silencio) cualquier mensaje que no venga de TU chat: el bot de Telegram es público.\n// 2) Descarta mensajes viejos (Telegram reentrega los pendientes cuando vuelve la conexión).\n// 3) Solo entiende \"/subir 1\", \"/subir 2\" o \"/subir 3\". La ruta se arma con una carpeta fija + ese dígito:\n//    nada de lo que escriba la persona entra en una ruta ni en un comando.\n// ---------------------------------------------------------------------------\nconst CHAT_AUTORIZADO = 'REEMPLAZA-CON-TU-CHAT-ID';\nconst BASE = 'C:\\\\Users\\\\TU-USUARIO\\\\.n8n-files\\\\opciones';   // dentro de ~/.n8n-files, que n8n 2.x permite por defecto\n// ---------------------------------------------------------------------------\nconst trigger = $input.first().json || {};\nconst msg = trigger.message || {};\nconst chatId = msg.chat ? msg.chat.id : undefined;\nif (String(chatId) !== CHAT_AUTORIZADO) return [];                    // mensaje ajeno: no se responde nada\n\nconst fecha = Number(msg.date);\nif (fecha > 0 && (Date.now() / 1000 - fecha) > 600) return [];        // más de 10 minutos de antigüedad\n\nconst texto = String(msg.text || '').trim();\nconst m = /^\\/subir(?:@\\w+)?\\s+([1-3])$/.exec(texto);\nif (!m) {\n  return [{ json: { valido: false, chatId, respuesta: 'Para subir un video escribe: /subir 1, /subir 2 o /subir 3' } }];\n}\nconst n = m[1];\nreturn [{\n  json: {\n    valido: true,\n    chatId,\n    opcion: n,\n    rutaMeta: BASE + '\\\\' + n + '\\\\publicacion.json',\n    rutaVideo: BASE + '\\\\' + n + '\\\\video.mp4',\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "ed2ee60f-fa5e-5c04-82d2-bbf976196297",
+      "name": "¿Pedido válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b3c876b5-adec-5e52-bba5-53c927adce08",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "981db494-d81a-50e3-b7a2-a157f1254266",
+      "name": "Avisar problema",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1560,
+        360
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Solo tu chat y /subir N').first().json.chatId }}",
+        "text": "={{ $json.respuesta || ('No pude completar el pedido: ' + ($json.error && $json.error.message ? $json.error.message : ($json.error || 'error desconocido'))) }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      }
+    },
+    {
+      "id": "e9f5571d-2d26-52ee-92a7-ffb4e13b149b",
+      "name": "Leer datos",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        780,
+        -40
+      ],
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $json.rutaMeta }}",
+        "options": {
+          "dataPropertyName": "meta"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "950d41a2-1190-5ef7-a41d-298c5a4ce361",
+      "name": "Validar datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -80
+      ],
+      "parameters": {
+        "jsCode": "// VALIDAR DATOS\n// Lee publicacion.json de la carpeta elegida y comprueba título, descripción y etiquetas ANTES de subir.\n// Lo importante lo fija este código y NO el archivo ni una IA: el video se sube siempre en PRIVADO,\n// siempre marcado «para niños», en español. Aunque publicacion.json diga otra cosa, se ignora.\n// ---------------------------------------------------------------------------\nconst MAX_TITULO = 100;                 // límite de YouTube\nconst MAX_DESCRIPCION_BYTES = 4800;     // YouTube acepta 5000 bytes; se deja margen\nconst MAX_ETIQUETAS_CARACTERES = 450;   // YouTube acepta 500 en total\nconst MAX_ETIQUETAS = 20;\n// ---------------------------------------------------------------------------\nconst previo = $('Solo tu chat y /subir N').first().json;\nconst falla = (motivo) => [{ json: { ok: false, chatId: previo.chatId, respuesta: 'No subí nada. ' + motivo } }];\n\nlet datos;\ntry {\n  const buf = await this.helpers.getBinaryDataBuffer(0, 'meta');\n  datos = JSON.parse(buf.toString('utf8'));\n} catch (e) {\n  return falla('No pude leer publicacion.json de la carpeta ' + previo.opcion + ' (¿existe y es un JSON válido?).');\n}\nif (!datos || typeof datos !== 'object' || Array.isArray(datos)) return falla('publicacion.json debe ser un objeto con titulo, descripcion y etiquetas.');\n\nconst titulo = typeof datos.titulo === 'string' ? datos.titulo.trim() : '';\nif (!titulo) return falla('Falta el «titulo» en publicacion.json.');\nif (titulo.length > MAX_TITULO) return falla('El título tiene ' + titulo.length + ' caracteres; el máximo es ' + MAX_TITULO + '.');\nif (/[<>]/.test(titulo)) return falla('El título no puede llevar los símbolos < o >.');\n\nconst descripcion = typeof datos.descripcion === 'string' ? datos.descripcion.trim() : '';\nif (!descripcion) return falla('Falta la «descripcion» en publicacion.json (créditos, fuentes y la frase de IA si aplica).');\nif (Buffer.byteLength(descripcion, 'utf8') > MAX_DESCRIPCION_BYTES) return falla('La descripción es demasiado larga (máximo ' + MAX_DESCRIPCION_BYTES + ' bytes).');\nif (/[<>]/.test(descripcion)) return falla('La descripción no puede llevar los símbolos < o >.');\n\nconst etiquetasIn = Array.isArray(datos.etiquetas) ? datos.etiquetas : [];\nconst etiquetas = etiquetasIn.map((t) => String(t == null ? '' : t).replace(/[,<>]/g, ' ').trim()).filter(Boolean);\nif (etiquetas.length > MAX_ETIQUETAS) return falla('Hay ' + etiquetas.length + ' etiquetas; el máximo es ' + MAX_ETIQUETAS + '.');\nconst total = etiquetas.reduce((s, t) => s + t.length + 1, 0);\nif (total > MAX_ETIQUETAS_CARACTERES) return falla('Las etiquetas suman demasiados caracteres (máximo ' + MAX_ETIQUETAS_CARACTERES + ').');\n\nreturn [{\n  json: {\n    ok: true,\n    chatId: previo.chatId,\n    opcion: previo.opcion,\n    titulo,\n    descripcion,\n    etiquetas: etiquetas.join(','),\n    // Fijos, no se leen del archivo:\n    privacidad: 'private',\n    paraNinos: true,\n    categoria: '24',\n    idioma: 'es',\n  },\n}];\n"
+      }
+    },
+    {
+      "id": "024335a0-f7d6-570e-9af3-66b01ecc985f",
+      "name": "¿Datos válidos?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        -80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9b1aa9f8-55a6-5e55-9d53-8976e0a670eb",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "8248b07e-8db5-56f3-b147-1dd693b247ca",
+      "name": "Leer video",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        -120
+      ],
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "={{ $('Solo tu chat y /subir N').first().json.rutaVideo }}",
+        "options": {
+          "dataPropertyName": "video"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "b520931f-2409-5449-a08b-51c301ec83ad",
+      "name": "Subir a YouTube (privado)",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        -160
+      ],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Validar datos').first().json.titulo }}",
+        "regionCode": "CO",
+        "categoryId": "={{ $('Validar datos').first().json.categoria }}",
+        "binaryProperty": "video",
+        "options": {
+          "description": "={{ $('Validar datos').first().json.descripcion }}",
+          "tags": "={{ $('Validar datos').first().json.etiquetas }}",
+          "defaultLanguage": "={{ $('Validar datos').first().json.idioma }}",
+          "privacyStatus": "private",
+          "selfDeclaredMadeForKids": true,
+          "notifySubscribers": false
+        }
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "REEMPLAZAR-YOUTUBE",
+          "name": "YouTube (mi canal)"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "02418d36-b1d2-50d5-91e6-848cfe6e2bc1",
+      "name": "Pedir aprobación",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        -160
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Solo tu chat y /subir N').first().json.chatId }}",
+        "message": "={{ 'Subí «' + $('Validar datos').first().json.titulo + '» como PRIVADO.\\nRevísalo aquí: https://youtu.be/' + $json.uploadId + '\\n\\n¿Lo publico?' }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Publicar",
+            "disapproveLabel": "❌ Dejar privado"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 24,
+              "resumeUnit": "hours"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      },
+      "webhookId": "9b603ece-2815-54b0-9a41-e266944a5677"
+    },
+    {
+      "id": "f8bce50f-3221-5c90-bfac-07904484f812",
+      "name": "¿Aprobó?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2340,
+        -160
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b68923dd-2f74-59fc-920b-609e52ede8c7",
+              "leftValue": "={{ !!($json.data && $json.data.approved === true) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "38575c56-ca57-5e4f-a6f5-e34ae0b8f3ef",
+      "name": "Publicar (hacer público)",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        -240
+      ],
+      "parameters": {
+        "resource": "video",
+        "operation": "update",
+        "videoId": "={{ $('Subir a YouTube (privado)').first().json.uploadId }}",
+        "title": "={{ $('Validar datos').first().json.titulo }}",
+        "regionCode": "CO",
+        "categoryId": "={{ $('Validar datos').first().json.categoria }}",
+        "updateFields": {
+          "privacyStatus": "public",
+          "description": "={{ $('Validar datos').first().json.descripcion }}",
+          "tags": "={{ $('Validar datos').first().json.etiquetas }}",
+          "defaultLanguage": "={{ $('Validar datos').first().json.idioma }}",
+          "selfDeclaredMadeForKids": true
+        }
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "REEMPLAZAR-YOUTUBE",
+          "name": "YouTube (mi canal)"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "0b3e2121-b3a2-530d-92f2-5e741d24331d",
+      "name": "Avisar publicado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        -280
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Solo tu chat y /subir N').first().json.chatId }}",
+        "text": "={{ '✅ Publicado: https://youtu.be/' + $('Subir a YouTube (privado)').first().json.uploadId }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      }
+    },
+    {
+      "id": "2b6686c0-84e1-545c-9a60-8052b1c277f6",
+      "name": "Avisar que queda privado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2600,
+        -60
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Solo tu chat y /subir N').first().json.chatId }}",
+        "text": "={{ 'Queda en PRIVADO: https://youtu.be/' + $('Subir a YouTube (privado)').first().json.uploadId + ' (puedes publicarlo tú desde YouTube Studio).' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Solo tu chat y /subir N",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solo tu chat y /subir N": {
+      "main": [
+        [
+          {
+            "node": "¿Pedido válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Pedido válido?": {
+      "main": [
+        [
+          {
+            "node": "Leer datos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer datos": {
+      "main": [
+        [
+          {
+            "node": "Validar datos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar datos": {
+      "main": [
+        [
+          {
+            "node": "¿Datos válidos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Datos válidos?": {
+      "main": [
+        [
+          {
+            "node": "Leer video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer video": {
+      "main": [
+        [
+          {
+            "node": "Subir a YouTube (privado)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir a YouTube (privado)": {
+      "main": [
+        [
+          {
+            "node": "Pedir aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir aprobación": {
+      "main": [
+        [
+          {
+            "node": "¿Aprobó?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Aprobó?": {
+      "main": [
+        [
+          {
+            "node": "Publicar (hacer público)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar que queda privado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar (hacer público)": {
+      "main": [
+        [
+          {
+            "node": "Avisar publicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar problema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -13,6 +13,7 @@ Cada carpeta de `skills/` es una skill: un `SKILL.md` con instrucciones para que
 | `firebase` / `gemini` / `mcp` | Firebase, la API de Gemini y servidores MCP. |
 | `agentes-calidad` | Probar prompts, revisar la seguridad de un agente y **revisores automáticos** de flujos de n8n y de bots. |
 | `apis-y-mensajeria` | APIs gratis, bot de Telegram, WhatsApp oficial. |
+| `youtube` | Agente de n8n para un canal de videos infantiles: investigador de virales y subida con aprobación (privado primero). |
 
 La lista completa, con cuándo usar cada una, está en **`INDICE-DE-SKILLS.md`**. De dónde viene cada una: `FUENTES.md`. Seguridad: `SEGURIDAD.md`. Qué se probó de verdad: `PRUEBAS.md`. Errores aprendidos: `LECCIONES.md`.
 

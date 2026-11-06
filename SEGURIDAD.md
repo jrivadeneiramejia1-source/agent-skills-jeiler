@@ -36,3 +36,10 @@ Hecha el 2026-11-04.
 - `probar_webhook.py` solo habla con direcciones locales salvo `--permitir-remoto` (para bots del propio usuario) y no guarda ni imprime las claves que recibe.
 - Nuevo `.github/workflows/pruebas.yml`: corre las pruebas sin secretos, con permisos de solo lectura, `actions/checkout` fijado a commit y `persist-credentials: false`.
 - El flujo heredado `agent-skills-discovery.yml` (publicaba releases con permisos de escritura al hacer push a `main`) quedó **desactivado** (`.yml.desactivado`). Los otros flujos heredados no se tocaron.
+
+## Fase 5 (2026-11-06, `agente-youtube-infantil`)
+- Skill original nueva: código propio (JavaScript de los nodos, Python y Node para generar y probar). **No se copió código de terceros.** n8n 2.46.6 (licencia «Sustainable Use», no es de las abiertas de la lista) se instaló **aparte, fuera del repo**, solo para importar y validar; corrió en local, sin cuentas, sin claves y con la telemetría apagada. Node.js 24 vino del paquete `node` de npm (MIT). Anotado en `FUENTES.md`.
+- Decisiones de seguridad del diseño: solo obedece al chat del dueño (el bot de Telegram es público); la ruta del video se arma con una carpeta fija y un dígito 1–3 (nada escrito por la persona entra en una ruta ni en un comando); la subida es **privada** y «para niños» **fijado en el código** (no en un archivo ni en una IA); pasar a público exige un botón en Telegram; el texto que viene de YouTube se escapa antes de mandarlo con formato HTML; la clave de la API va en una credencial de n8n (no en la dirección del nodo); las plantillas salen apagadas, sin `pinData` y con credenciales de relleno.
+- Revisores nuevos (F12–F14) en `revisar-flujo-n8n`: solo leen el archivo. **No ven lo que compara un IF.**
+- gitleaks sobre lo nuevo: sin hallazgos. valn8n: 0 errores.
+- Sin probar: subida real, OAuth real, Telegram real, ngrok (ver `PRUEBAS.md`). El OAuth de Google en estado «Testing» vence a los 7 días; la guía lo explica.

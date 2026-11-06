@@ -5,7 +5,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 SKILLS = RAIZ / "skills"
-ORIGINALES = ["revisar-flujo-n8n", "seguridad-agentes", "probar-prompts", "apis-gratis", "bot-telegram", "plantillas-n8n", "whatsapp-cloud-api"]
+ORIGINALES = ["revisar-flujo-n8n", "seguridad-agentes", "probar-prompts", "apis-gratis", "bot-telegram", "plantillas-n8n", "whatsapp-cloud-api", "agente-youtube-infantil"]
 
 
 def grupos():

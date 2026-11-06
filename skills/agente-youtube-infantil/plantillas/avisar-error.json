@@ -1,0 +1,99 @@
+{
+  "name": "Avisar por Telegram cuando falla un flujo",
+  "nodes": [
+    {
+      "id": "b5d16bd8-0578-5264-8445-ffd4a64bc0c8",
+      "name": "Léeme",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -40
+      ],
+      "parameters": {
+        "content": "## Aviso de errores\nElígelo como **Error workflow** (Settings → Error workflow) en el flujo investigador y en el subidor. Cuando uno falle te llega un Telegram. Edita tu chat en el nodo «Mensaje de error».",
+        "height": 220,
+        "width": 420
+      }
+    },
+    {
+      "id": "dc76659e-11a8-5ca6-bed0-0c5b2e7e4454",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "a9025c76-a239-5022-96a1-5a15ec45c631",
+      "name": "Mensaje de error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// MENSAJE DE ERROR\n// Se activa cuando falla OTRO flujo (el que lo tenga como «Error workflow»). Arma un aviso corto para Telegram.\n// ---------------------------------------------------------------------------\nconst CHAT_ID = 'REEMPLAZA-CON-TU-CHAT-ID';\n// ---------------------------------------------------------------------------\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst e = $input.first().json || {};\nconst flujo = (e.workflow && e.workflow.name) || 'un flujo';\nconst nodo = e.execution && e.execution.lastNodeExecuted;\nconst motivo = e.execution && e.execution.error && e.execution.error.message;\nconst texto = '⚠️ <b>Falló ' + esc(flujo) + '</b>' + (nodo ? '\\nNodo: ' + esc(nodo) : '') + (motivo ? '\\nMotivo: ' + esc(String(motivo).slice(0, 300)) : '') +\n  '\\n\\nMira el detalle en Executions (Ejecuciones) de n8n.';\nreturn [{ json: { texto, chatId: CHAT_ID } }];\n"
+      }
+    },
+    {
+      "id": "b32dcc95-2828-52db-afc5-cd1e42677d02",
+      "name": "Enviar aviso",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.texto }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Mensaje de error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensaje de error": {
+      "main": [
+        [
+          {
+            "node": "Enviar aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
