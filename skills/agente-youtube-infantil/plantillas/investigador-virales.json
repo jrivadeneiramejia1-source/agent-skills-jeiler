@@ -1,0 +1,375 @@
+{
+  "name": "Investigador de videos infantiles virales (YouTube)",
+  "nodes": [
+    {
+      "id": "481d61dc-cbc6-57a3-bdce-2f5c087764fa",
+      "name": "Léeme",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -40
+      ],
+      "parameters": {
+        "content": "## Investigador de virales\nTodos los días a las 8 busca videos infantiles en español de los últimos 3, 7 y 30 días y te manda por Telegram los que más superaron el promedio de su canal.\n\n**Antes de activarlo:**\n1. Credencial «Clave de la API de YouTube» (Header/Query Auth: nombre `key`).\n2. Credencial de Telegram.\n3. Edita tu número de chat en el nodo «Configuración».\n4. Prueba con «Probar a mano».\n\nUsa el resultado para aprender la fórmula; **no copies** personajes, guiones, imágenes ni música.",
+        "height": 330,
+        "width": 440
+      }
+    },
+    {
+      "id": "de74110e-0bb5-526e-affd-992f5682f908",
+      "name": "Cada día a las 8",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cbb088ad-61f3-5aee-be39-8a09d6d2543a",
+      "name": "Probar a mano",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "361b4133-16c8-5a40-a65a-c6ee6274dcca",
+      "name": "Configuración",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// CONFIGURACIÓN DEL INVESTIGADOR — edita solo esta parte (entre las dos líneas de guiones).\n// ---------------------------------------------------------------------------\nconst CHAT_ID = 'REEMPLAZA-CON-TU-CHAT-ID';            // tu número de chat de Telegram (te lo explica la guía)\nconst CONSULTAS = ['canciones infantiles', 'canciones para niños', 'cuentos infantiles', 'videos infantiles'];\nconst VENTANAS_DIAS = [3, 7, 30];                       // busca videos de los últimos 3, 7 y 30 días\nconst MAX_POR_BUSQUEDA = 25;                            // cuántos videos pide por búsqueda (máximo 50)\n// ---------------------------------------------------------------------------\n// Cada combinación consulta × ventana es UNA búsqueda en la API de YouTube (1 de las 100 gratis al día).\n// Con 4 consultas y 3 ventanas son 12 búsquedas por corrida.\nconst ahora = Date.now();\nconst trabajos = [];\nfor (const q of CONSULTAS) {\n  for (const dias of VENTANAS_DIAS) {\n    trabajos.push({\n      json: {\n        q,\n        dias,\n        publishedAfter: new Date(ahora - dias * 86400000).toISOString(),\n        maxResults: Math.min(Math.max(Number(MAX_POR_BUSQUEDA) || 25, 1), 50),\n        chatId: CHAT_ID,\n      },\n    });\n  }\n}\nreturn trabajos;\n"
+      }
+    },
+    {
+      "id": "5354a13f-17ac-53eb-9233-107671196f8c",
+      "name": "Buscar videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        100
+      ],
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.q }}"
+            },
+            {
+              "name": "publishedAfter",
+              "value": "={{ $json.publishedAfter }}"
+            },
+            {
+              "name": "order",
+              "value": "viewCount"
+            },
+            {
+              "name": "maxResults",
+              "value": "={{ $json.maxResults }}"
+            },
+            {
+              "name": "relevanceLanguage",
+              "value": "es"
+            },
+            {
+              "name": "safeSearch",
+              "value": "strict"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REEMPLAZAR-CLAVE-YOUTUBE",
+          "name": "Clave de la API de YouTube"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "b6e80357-c059-555b-8dab-4560dd2940b5",
+      "name": "Armar lotes de videos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// ARMAR LOTES DE VIDEOS\n// Junta los videos que devolvieron todas las búsquedas, quita los repetidos y los agrupa de 50 en 50\n// (la API de YouTube acepta hasta 50 identificadores por consulta de estadísticas).\nconst ids = new Set();\nlet erroresBusqueda = 0;\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  if (j.error || !Array.isArray(j.items)) { erroresBusqueda++; continue; }   // una búsqueda falló: se sigue con las demás\n  for (const v of j.items) {\n    const id = v && v.id && v.id.videoId;\n    if (typeof id === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(id)) ids.add(id);\n  }\n}\nconst lista = [...ids].slice(0, 300);                   // tope de seguridad\nconst lotes = [];\nfor (let i = 0; i < lista.length; i += 50) {\n  lotes.push({ json: { ids: lista.slice(i, i + 50).join(','), erroresBusqueda } });\n}\nif (!lotes.length) return [{ json: { ids: '', erroresBusqueda } }];\nreturn lotes;\n"
+      }
+    },
+    {
+      "id": "544e6a52-367f-5b75-8772-3b1f96b011de",
+      "name": "Estadísticas de videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        100
+      ],
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/videos",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,statistics,contentDetails"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.ids }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REEMPLAZAR-CLAVE-YOUTUBE",
+          "name": "Clave de la API de YouTube"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "55c2b986-4987-5cf8-8459-c0131e9ee7ae",
+      "name": "Armar lotes de canales",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// ARMAR LOTES DE CANALES\n// De los videos con estadísticas saca los canales (sin repetir) y los agrupa de 50 en 50.\nconst canales = new Set();\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  if (j.error || !Array.isArray(j.items)) continue;\n  for (const v of j.items) {\n    const c = v && v.snippet && v.snippet.channelId;\n    if (typeof c === 'string' && /^[A-Za-z0-9_-]{10,40}$/.test(c)) canales.add(c);\n  }\n}\nconst lista = [...canales];\nconst lotes = [];\nfor (let i = 0; i < lista.length; i += 50) {\n  lotes.push({ json: { ids: lista.slice(i, i + 50).join(',') } });\n}\nif (!lotes.length) return [{ json: { ids: '' } }];\nreturn lotes;\n"
+      }
+    },
+    {
+      "id": "b8b07b6b-decd-5329-b6b6-5b16f14723a9",
+      "name": "Datos de canales",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        100
+      ],
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/channels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,statistics"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.ids }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REEMPLAZAR-CLAVE-YOUTUBE",
+          "name": "Clave de la API de YouTube"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "2556877f-18bf-5bdb-a3af-20add007e8ab",
+      "name": "Calcular virales",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// CALCULAR VIRALES\n// Ordena los videos por cuánto superaron el promedio del RESTO de videos de su propio canal\n// (\"múltiplo\"), para que un canal grande no gane solo por ser grande. Es una pista, no una garantía.\n// ---------------------------------------------------------------------------\nconst MIN_VISTAS = 1000;          // ignora videos con menos vistas\nconst MIN_VIDEOS_CANAL = 5;       // el canal necesita al menos 5 videos para que su promedio signifique algo\nconst MIN_MULTIPLO = 2;           // solo videos que superaron al menos 2 veces el promedio de su canal\nconst TOP = 5;                    // cuántos muestra por ventana de tiempo\nconst VENTANAS = [\n  { dias: 3, nombre: 'Últimos 3 días' },\n  { dias: 7, nombre: 'Últimos 7 días' },\n  { dias: 30, nombre: 'Últimos 30 días' },\n];\n// ---------------------------------------------------------------------------\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst num = (n) => Math.round(Number(n)).toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');\nconst dec = (n) => (Math.round(n * 10) / 10).toString().replace('.', ',');\nconst duracion = (iso) => {\n  const m = /^PT(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?$/.exec(String(iso || ''));\n  if (!m) return 0;\n  return (Number(m[1] || 0) * 3600) + (Number(m[2] || 0) * 60) + Number(m[3] || 0);\n};\nconst mmss = (seg) => {\n  const h = Math.floor(seg / 3600), m = Math.floor((seg % 3600) / 60), s = seg % 60;\n  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0');\n};\n\nconst chatId = ($('Configuración').first().json || {}).chatId;\nconst ahora = Date.now();\n\n// Canales: id -> promedio de vistas del RESTO de sus videos (sin contar el que estamos evaluando)\nconst canales = new Map();\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  if (j.error || !Array.isArray(j.items)) continue;\n  for (const c of j.items) {\n    const st = (c && c.statistics) || {};\n    canales.set(c.id, {\n      vistas: Number(st.viewCount),\n      videos: Number(st.videoCount),\n      suscriptores: st.hiddenSubscriberCount ? null : Number(st.subscriberCount),\n      nombre: (c.snippet && c.snippet.title) || '',\n    });\n  }\n}\n\nconst candidatos = [];\nconst vistos = new Set();\nlet revisados = 0;\nfor (const it of $('Estadísticas de videos').all()) {\n  const j = it.json || {};\n  if (j.error || !Array.isArray(j.items)) continue;\n  for (const v of j.items) {\n    if (!v || !v.id || vistos.has(v.id)) continue;\n    vistos.add(v.id);\n    revisados++;\n    const sn = v.snippet || {};\n    if (sn.liveBroadcastContent && sn.liveBroadcastContent !== 'none') continue;   // sin directos\n    const vistas = Number((v.statistics || {}).viewCount);\n    const canal = canales.get(sn.channelId);\n    if (!Number.isFinite(vistas) || vistas < MIN_VISTAS || !canal) continue;\n    if (!Number.isFinite(canal.videos) || canal.videos < MIN_VIDEOS_CANAL || !Number.isFinite(canal.vistas)) continue;\n    const base = (canal.vistas - vistas) / (canal.videos - 1);          // promedio del resto de videos\n    if (!(base > 0)) continue;\n    const multiplo = vistas / base;\n    const publicado = Date.parse(sn.publishedAt);\n    if (!Number.isFinite(publicado)) continue;\n    const edadDias = (ahora - publicado) / 86400000;\n    if (edadDias < 0) continue;\n    const ventana = VENTANAS.find((w) => edadDias <= w.dias);\n    if (!ventana || multiplo < MIN_MULTIPLO) continue;\n    candidatos.push({\n      id: v.id, titulo: sn.title || '(sin título)', canal: sn.channelTitle || canal.nombre, vistas, multiplo,\n      edadDias, ventana: ventana.nombre, seg: duracion((v.contentDetails || {}).duration),\n    });\n  }\n}\n\nconst bloques = [];\nlet mostrados = 0;\nfor (const w of VENTANAS) {\n  const lista = candidatos.filter((c) => c.ventana === w.nombre).sort((a, b) => b.multiplo - a.multiplo).slice(0, TOP);\n  if (!lista.length) continue;\n  const lineas = lista.map((c, i) => {\n    mostrados++;\n    const hace = c.edadDias < 1 ? 'hoy' : 'hace ' + Math.floor(c.edadDias) + ' d';\n    return (i + 1) + '. <b>' + esc(c.titulo) + '</b>\\n   ' + esc(c.canal) + ' · ' + hace + ' · ' + num(c.vistas) + ' vistas · ×' + dec(c.multiplo) +\n      ' su promedio' + (c.seg ? ' · ' + mmss(c.seg) : '') + '\\n   https://youtu.be/' + c.id;\n  });\n  bloques.push('<b>' + w.nombre + '</b>\\n' + lineas.join('\\n'));\n}\n\nlet texto;\nif (!mostrados) {\n  texto = 'Hoy no encontré videos que superen ' + MIN_MULTIPLO + ' veces el promedio de su canal (revisé ' + revisados + ' videos).';\n} else {\n  texto = '🔎 <b>Videos infantiles que están funcionando</b> (revisé ' + revisados + ')\\n\\n' + bloques.join('\\n\\n') +\n    '\\n\\nEl «×» compara cada video con el promedio del RESTO de videos de su canal: es una pista, no una garantía. ' +\n    'Úsalo para aprender la fórmula (tema, gancho, estructura), nunca para copiar su personaje, guion, imágenes ni música.';\n  while (texto.length > 3900 && bloques.length > 1) {      // Telegram acepta hasta 4096 caracteres\n    bloques.pop();\n    texto = '🔎 <b>Videos infantiles que están funcionando</b> (recortado)\\n\\n' + bloques.join('\\n\\n');\n  }\n}\nreturn [{ json: { texto, chatId, revisados, mostrados } }];\n"
+      }
+    },
+    {
+      "id": "53a5611a-4cf7-5d8f-b92b-e7f3192b8d45",
+      "name": "Enviar por Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        100
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.texto }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "REEMPLAZAR-TELEGRAM",
+          "name": "Telegram (mi bot)"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Cada día a las 8": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Probar a mano": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración": {
+      "main": [
+        [
+          {
+            "node": "Buscar videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar videos": {
+      "main": [
+        [
+          {
+            "node": "Armar lotes de videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar lotes de videos": {
+      "main": [
+        [
+          {
+            "node": "Estadísticas de videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estadísticas de videos": {
+      "main": [
+        [
+          {
+            "node": "Armar lotes de canales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar lotes de canales": {
+      "main": [
+        [
+          {
+            "node": "Datos de canales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos de canales": {
+      "main": [
+        [
+          {
+            "node": "Calcular virales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular virales": {
+      "main": [
+        [
+          {
+            "node": "Enviar por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

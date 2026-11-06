@@ -19,7 +19,7 @@ Un flujo de n8n exportado es un archivo `.json`. Ahí pueden quedar claves, dato
    python -I skills\revisar-flujo-n8n\scripts\revisar_flujo.py MI-FLUJO.json
    ```
    Salida 0 = sin hallazgos graves; 1 = hay ALTA; 2 = el archivo no se pudo leer. Con `--json` da el resultado en JSON.
-3. Arreglar primero las **ALTA**, luego las MEDIA. Cada hallazgo trae el id (F01…F11); la explicación y la fuente de cada regla está en `references/reglas.md`.
+3. Arreglar primero las **ALTA**, luego las MEDIA. Cada hallazgo trae el id (F01…F14); la explicación y la fuente de cada regla está en `references/reglas.md`.
 4. Si encontró una clave real: **cambiarla en el servicio** (la que estuvo escrita ya no es secreta), usar una credencial de n8n y volver a exportar.
 5. Antes de subir a GitHub: sin `pinData`, sin credenciales, sin correos ni teléfonos reales, flujo desactivado.
 
@@ -36,6 +36,9 @@ Un flujo de n8n exportado es un archivo `.json`. Ahí pueden quedar claves, dato
 | F09 | MEDIA | Certificados no válidos aceptados o llamadas `http://`. |
 | F10 | MEDIA | Correo o teléfono escrito en un nodo. |
 | F11 | BAJA | Exportado como activo, o nodos apagados. |
+| F12 | ALTA o MEDIA | Subida a YouTube sin `privacyStatus` fijo en `private` (ALTA si falta o es `public`). |
+| F13 | MEDIA | Subida o paso a público sin declarar `selfDeclaredMadeForKids`. |
+| F14 | ALTA | Poner un video en `public` sin una aprobación (`sendAndWait` + IF) en el camino. Ver `agente-youtube-infantil`. |
 
 ## Herramienta complementaria (opcional): valn8n
 `revisar_flujo.py` se enfoca en **seguridad**. Para **estructura** (nodos sueltos, parámetros que no existen para esa versión del nodo, expresiones mal escritas, falta de `onError`) existe `valn8n` (MIT, Python 3.13 y `uv`): `valn8n check MI-FLUJO.json`. Es un proyecto joven (versión 0.1.1, pocas estrellas): úsalo como segunda opinión, no como única revisión. Detalle, revisión de seguridad y medición en `references/herramientas.md`.

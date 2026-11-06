@@ -1,0 +1,73 @@
+{
+  "name": "MALO a propósito: nodos que n8n rechaza (para probar comprobar_con_n8n.mjs)",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "YT sin titulo",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "binaryProperty": "video",
+        "regionCode": "CO",
+        "categoryId": "24",
+        "options": {
+          "privacyStatus": "secreto"
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "Version falsa",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 99,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Tipo falso",
+      "type": "n8n-nodes-base.noExiste",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "IF sin condicion valida",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "a",
+              "leftValue": "x",
+              "rightValue": "",
+              "operator": {
+                "type": "cosa",
+                "operation": "rara"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

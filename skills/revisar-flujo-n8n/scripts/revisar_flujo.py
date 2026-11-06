@@ -160,7 +160,90 @@ def revisar_flujo(wf):
     apagados = [n for n in nodos if n.get("disabled")]
     if apagados:
         add("F11", "BAJA", None, f"{len(apagados)} nodo(s) apagados: bórralos si ya no sirven.")
+    # F12-F14 subidas a YouTube: privadas primero, «para niños» declarado, y público solo tras aprobación
+    revisar_youtube(wf, activos, tipo, nombre, add)
     return h
+
+
+def _campos_youtube(n):
+    """Da (operación, campos) del nodo YouTube de video: «options» al subir, «updateFields» al actualizar."""
+    p = n.get("parameters") or {}
+    if str(p.get("resource", "video")).lower() != "video":
+        return None, {}
+    op = str(p.get("operation", "")).lower()
+    clave = "options" if op == "upload" else "updateFields"
+    campos = p.get(clave)
+    return op, campos if isinstance(campos, dict) else {}
+
+
+def _pasa_por_aprobacion(wf, activos, destino):
+    """True si `destino` solo se alcanza después de una aprobación: hay camino desde un nodo «sendAndWait» (pedir aprobación)
+    hasta él pasando por un IF/Switch/Filter, y NO hay ningún camino desde un disparador que llegue sin pasar por la aprobación.
+    Mira la forma del flujo, no lo que compara el IF: eso hay que leerlo a mano."""
+    por_nombre = {n.get("name"): n for n in activos}
+    siguientes, con_entrada = {}, set()
+    for origen, salidas in (wf.get("connections") or {}).items():
+        for rama in (salidas or {}).get("main", []) or []:
+            for c in rama or []:
+                if isinstance(c, dict):
+                    siguientes.setdefault(origen, set()).add(c.get("node"))
+                    con_entrada.add(c.get("node"))
+    condicional = lambda n: any(k in str(n.get("type", "")).lower() for k in (".if", "switch", "filter"))  # noqa: E731
+    esperas = {n.get("name") for n in activos if str((n.get("parameters") or {}).get("operation", "")).lower() == "sendandwait"}
+
+    # 1) desde la aprobación, pasando por un IF, se llega al destino
+    pila = [(e, False) for e in esperas]
+    vistos, llega = set(pila), False
+    while pila and not llega:
+        actual, paso = pila.pop()
+        if actual == destino and paso:
+            llega = True
+        for s in siguientes.get(actual, ()):
+            if s in por_nombre:
+                e = (s, paso or condicional(por_nombre[s]))
+                if e not in vistos:
+                    vistos.add(e)
+                    pila.append(e)
+    if not llega:
+        return False
+
+    # 2) sin los nodos de aprobación, ningún disparador (nodo sin entradas) alcanza el destino
+    pila = [n.get("name") for n in activos if n.get("name") not in con_entrada and n.get("name") not in esperas]
+    vistos = set(pila)
+    while pila:
+        actual = pila.pop()
+        if actual == destino:
+            return False
+        for s in siguientes.get(actual, ()):
+            if s in por_nombre and s not in esperas and s not in vistos:
+                vistos.add(s)
+                pila.append(s)
+    return True
+
+
+def revisar_youtube(wf, activos, tipo, nombre, add):
+    for n in activos:
+        if not tipo(n).endswith(".youtube"):
+            continue
+        op, campos = _campos_youtube(n)
+        if op not in ("upload", "update"):
+            continue
+        priv = campos.get("privacyStatus")
+        if op == "upload":
+            if not priv:
+                add("F12", "ALTA", nombre(n), "Sube un video sin fijar «privacyStatus»: puede quedar público. Pon «private» y publica después de aprobar.")
+            elif isinstance(priv, str) and es_expresion(priv):
+                add("F12", "MEDIA", nombre(n), "La privacidad de la subida sale de una expresión. Déjala fija en «private».")
+            elif priv == "public":
+                add("F12", "ALTA", nombre(n), "Sube el video directamente en público. Sube en «private» y publica solo tras la aprobación.")
+            elif priv != "private":
+                add("F12", "MEDIA", nombre(n), "Sube el video como «no listado» (lo ve quien tenga el enlace). Mejor «private».")
+        if "selfDeclaredMadeForKids" not in campos and (op == "upload" or priv == "public"):
+            add("F13", "MEDIA", nombre(n),
+                "No declara «selfDeclaredMadeForKids». YouTube pide decir si el video es para niños; si no lo mandas, queda lo que diga el canal. Decláralo fijo en el nodo.")
+        if priv == "public" and not _pasa_por_aprobacion(wf, activos, n.get("name")):
+            add("F14", "ALTA", nombre(n),
+                "Hace público un video sin que antes haya una aprobación (nodo «sendAndWait» + IF) en su camino. Nada debe publicarse solo.")
 
 
 def cargar(ruta):

@@ -1,0 +1,24 @@
+{
+  "name": "MALO a propósito: sube a YouTube sin cuidado",
+  "nodes": [
+    {"id": "m1", "name": "Telegram Trigger", "type": "n8n-nodes-base.telegramTrigger", "typeVersion": 1.2, "position": [0, 0],
+     "parameters": {"updates": ["message"], "additionalFields": {}}, "credentials": {"telegramApi": {"id": "X", "name": "Telegram (mi bot)"}}},
+    {"id": "m2", "name": "Subir video", "type": "n8n-nodes-base.youTube", "typeVersion": 1, "position": [300, 0],
+     "parameters": {"resource": "video", "operation": "upload", "title": "={{ $json.message.text }}", "regionCode": "CO", "categoryId": "24",
+                    "binaryProperty": "video", "options": {"description": "Video de prueba"}},
+     "credentials": {"youTubeOAuth2Api": {"id": "X", "name": "YouTube (mi canal)"}}},
+    {"id": "m3", "name": "Hacer público", "type": "n8n-nodes-base.youTube", "typeVersion": 1, "position": [600, 0],
+     "parameters": {"resource": "video", "operation": "update", "videoId": "={{ $json.uploadId }}", "title": "Video de prueba", "regionCode": "CO", "categoryId": "24",
+                    "updateFields": {"privacyStatus": "public"}},
+     "credentials": {"youTubeOAuth2Api": {"id": "X", "name": "YouTube (mi canal)"}}},
+    {"id": "m4", "name": "Pedir aprobación (suelto)", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [600, 300],
+     "parameters": {"resource": "message", "operation": "sendAndWait", "chatId": "={{ $json.message.chat.id }}", "message": "¿Publico?", "responseType": "approval"},
+     "credentials": {"telegramApi": {"id": "X", "name": "Telegram (mi bot)"}}}
+  ],
+  "connections": {
+    "Telegram Trigger": {"main": [[{"node": "Subir video", "type": "main", "index": 0}]]},
+    "Subir video": {"main": [[{"node": "Hacer público", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "errorWorkflow": "REEMPLAZAR"}
+}

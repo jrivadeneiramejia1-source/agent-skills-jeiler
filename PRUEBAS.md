@@ -41,6 +41,25 @@ Al abrir el PR, el flujo heredado **«Agent Skills Discovery»** (`agent-skills-
 - El revisor de bots busca patrones de texto: no sabe si la lista de usuarios se aplica de verdad ni si la comparación es correcta.
 - Los 4 bots de ejemplo no se desplegaron ni se probaron contra Telegram o WhatsApp reales (necesitan tokens).
 
+## Agente de videos infantiles para YouTube (`agente-youtube-infantil`, 2026-11-06)
+| Qué | Cómo | Resultado |
+|---|---|---|
+| Código de cada nodo «Code» | `scripts/probar_codigo.mjs` corre el archivo de `codigo/` con datos inventados y imita las reglas de n8n (`$input`, `$('Nodo')`, resultado como lista de `{json}`). Fecha fija para `Date.now()` | Configuración, lotes, cálculo de virales (orden por múltiplo del propio canal; descarta directos, canales con pocos videos, pocas vistas y videos viejos; escapa HTML; cabe en 4.096 caracteres), puerta del chat, validación de datos y aviso de error: todo según lo esperado (17 pruebas). |
+| Lo que NO deja pasar la puerta | Chat ajeno, mensaje de más de 10 minutos, `/subir 4`, `/subir ../../x`, `/subir 1; calc`, saltos de línea, dígitos no latinos | Ninguno llega a una ruta: la ruta es una carpeta fija más un dígito 1–3. |
+| «Privado» y «para niños» fijos | `publicacion.json` con `privacidad: public`, `paraNinos: false`, idioma y categoría distintos | Se ignoran: sale `private`, `true`, `24`, `es`. |
+| Plantillas = código | `generar_plantillas.py --comprobar` falla si una plantilla no coincide con `codigo/*.js` | 0 diferencias; hay prueba. Además: ids y nombres únicos, sin nodos sueltos, todo `$('Nodo')` apunta a un nodo real, credenciales de relleno, exportadas apagadas. |
+| **n8n 2.46.6 de verdad** (instalado aparte, con Node 24) | `n8n import:workflow` de las 3 plantillas; `scripts/comprobar_con_n8n.mjs` valida cada nodo con el propio código de n8n (tipo, versión, campos obligatorios); un nodo «Validar datos» ejecutado dentro de n8n con `n8n execute` | Las 3 se importan; 0 problemas en los nodos; el nodo leyó el archivo con `this.helpers.getBinaryDataBuffer` y devolvió `private` / `true`. El comprobador con un flujo malo hecho a propósito detecta campo obligatorio faltante, versión y tipo inexistentes, **pero no** un valor de lista inventado (eso lo cubre F12). |
+| Reglas nuevas **F12–F14** del revisor | Plantillas buenas (0 hallazgos) y `ejemplos/flujo-youtube-malo.json` (F04, F12, F13, F14; 3 graves, salida 1); cambios a propósito: quitar `privacyStatus`, `public`, `unlisted`, expresión, quitar «para niños», 3 formas de saltarse la aprobación, nodos YouTube de otros recursos | Todas detectadas; sin falsas alarmas en las plantillas ni en el recurso «playlist». |
+| valn8n 0.1.1 | `valn8n check` sobre las 3 plantillas | 0 errores. Avisos: IDs de credencial de relleno (adrede) y falta de descripción/notas (sugerencias). |
+| gitleaks | `detect --no-git` sobre `skills/agente-youtube-infantil` y `tests/` | Sin hallazgos. |
+| Pruebas del repo | `python -I -m unittest discover -s tests` (con `N8N_CARPETA` y Node 24) | 66 pruebas pasan. Sin `N8N_CARPETA` esas 2 se saltan; sin Node se saltan las del código de los nodos. |
+
+### Qué no se probó (agente-youtube-infantil)
+- **Una subida real a YouTube**, el OAuth de Google, las llamadas reales a `search.list`/`videos.list`/`channels.list`, Telegram real (incluido el botón de `sendAndWait` y qué entrega n8n si pasan 24 horas sin contestar) y ngrok.
+- **Windows**: las rutas (`C:\Users\...`) están escritas pero no se corrieron en Windows.
+- Que el cálculo de «virales» sirva para elegir bien: la fórmula es una pista razonable, no está medida con datos reales de YouTube.
+- Nada de esto garantiza ingresos.
+
 ## Sobre la «activación sola»
 Es si Claude abre la skill por su cuenta cuando el usuario pide algo parecido. Con 10 skills de los tres repos cargadas a la vez, en 50 frases (30 que debían activarla y 20 que no) con Haiku: **activó la correcta en 20 de 30 y nunca una equivocada (0 de 20)**. Son pocas repeticiones, con un modelo distinto al de uso diario; sirve como señal, no como medida exacta.
 

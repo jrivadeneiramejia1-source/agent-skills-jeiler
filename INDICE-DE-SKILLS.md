@@ -83,6 +83,11 @@ Origen: google-gemini/gemini-skills (Apache-2.0).
 | **bot-telegram** | Un bot de Telegram gratis en Cloudflare Workers, con lista de usuarios permitidos. |
 | **whatsapp-cloud-api** | Conectar un agente a la API oficial de WhatsApp: webhook, firma, ventana de 24 horas. |
 
+## Videos infantiles en YouTube (original)
+| Skill | Cuándo usarla |
+|---|---|
+| **agente-youtube-infantil** | Montar en n8n un investigador de videos infantiles virales (te los manda por Telegram) y una subida a YouTube que es siempre **privada y «para niños»** hasta que pulses «Publicar». Trae el código de cada nodo, tres plantillas para importar y pruebas. Todavía no crea los videos ni mira estadísticas. |
+
 ## Se movieron a `app-skills-jeiler`
 `frontend-design`, `webapp-testing`, `theme-factory` y `canvas-design`: no son de agentes y estaban repetidas.
 
