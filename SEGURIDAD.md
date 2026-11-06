@@ -35,3 +35,4 @@ Hecha el 2026-11-04.
 - **gitleaks sobre el historial completo** (287 commits): 6 hallazgos, todos ejemplos ficticios (ver `PRUEBAS.md`).
 - `probar_webhook.py` solo habla con direcciones locales salvo `--permitir-remoto` (para bots del propio usuario) y no guarda ni imprime las claves que recibe.
 - Nuevo `.github/workflows/pruebas.yml`: corre las pruebas sin secretos, con permisos de solo lectura, `actions/checkout` fijado a commit y `persist-credentials: false`.
+- El flujo heredado `agent-skills-discovery.yml` (publicaba releases con permisos de escritura al hacer push a `main`) quedó **desactivado** (`.yml.desactivado`). Los otros flujos heredados no se tocaron.
